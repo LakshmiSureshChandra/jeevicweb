@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Work+Sans:wght@100..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Work Sans", sans-serif;
+  --font-lato: "Lato", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+  --font-inter: "Inter", sans-serif;
+
+  --color-blue: #0966b2;
+  --color-dark: #262626;
+
+  --animate-caret-blink: caret-blink 1.25s ease-out infinite;
+
+  @keyframes caret-blink {
+    0%,
+    70%,
+    100% {
+      opacity: 1;
+      transform: scale(0.95);
+    }
+    20%,
+    50% {
+      opacity: 0;
+    }
+  }
+}
+
+.hide-scrollbar {
+  overflow: auto; /* Ensures scrolling still works */
+  scrollbar-width: none; /* For Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Edge */
+}
+
+.AccordionContent {
+  overflow: hidden;
+}
+.AccordionContent[data-state="open"] {
+  animation: slideDown 300ms ease-out;
+}
+.AccordionContent[data-state="closed"] {
+  animation: slideUp 300ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}

@@ -7,7 +7,7 @@ import {
   Search01Icon,
   UserIcon,
 } from "hugeicons-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, Popover } from "radix-ui";
 import categoriesData from "../../data/categoriesData";
 import CategoriesMenu from "./CategoriesMenu";
@@ -19,6 +19,8 @@ import settingsData from "../../data/settingsData";
 const Header = () => {
   const [popupActive, setPopupActive] = useState(false);
   const [isHamOpen, setIsHamOpen] = useState(false);
+  const [cafeTransition, setCafeTransition] = useState(false);
+  const navigate = useNavigate();
 
   const parsedData = JSON.parse(localStorage.getItem("userData"));
 
@@ -40,11 +42,37 @@ const Header = () => {
     };
   }, [popupActive]);
 
+  const handleCafeClick = (e) => {
+    e.preventDefault();
+    
+    // Start the animation
+    setCafeTransition(true);
+    
+    // Wait for the animation to complete before navigating
+    setTimeout(() => {
+      setCafeTransition(false);
+      navigate("/cafe");
+    }, 800); // Duration slightly longer than the animation
+  };
+
   return (
     <header
       className="relative flex w-full justify-center lg:justify-end"
       ref={headerRef}
     >
+      {/* Cafe transition overlay */}
+      <div 
+        className={`fixed inset-0 z-50 bg-blue-600 transition-all duration-700 flex items-center justify-center ${
+          cafeTransition ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className={`text-white text-6xl font-bold transition-transform duration-500 ${
+          cafeTransition ? "scale-100" : "scale-50"
+        }`}>
+          Jeevic Cafe
+        </div>
+      </div>
+
       <div className="z-20 hidden w-[95%] items-center justify-between bg-white py-6 lg:flex">
         <Link
           to="/"
@@ -111,9 +139,12 @@ const Header = () => {
           </ul>
         </nav>
 
-        <div className="bg-blue flex h-fit items-center rounded-l-[5px] px-16 py-3 text-[30px] font-bold text-white">
+        <button 
+          onClick={handleCafeClick}
+          className="bg-blue flex h-fit items-center rounded-l-[5px] px-16 py-3 text-[30px] font-bold text-white transition-all duration-300 hover:bg-blue-700"
+        >
           Cafe
-        </div>
+        </button>
       </div>
 
       <div
@@ -195,7 +226,10 @@ const Header = () => {
             </button>
           </div>
 
-          <button className="bg-blue flex w-full cursor-pointer justify-between rounded-[4px] px-3 py-2 font-bold text-white">
+          <button 
+            onClick={handleCafeClick}
+            className="bg-blue flex w-full cursor-pointer justify-between rounded-[4px] px-3 py-2 font-bold text-white"
+          >
             <span>CAFE</span>
             <ArrowRight01Icon />
           </button>

@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import Header from "./layout/header/index";
 import SignUpLayout from "./layout/SignUpLayout";
@@ -27,18 +28,21 @@ import TermsAndConditions from "./pages/settings/TermsAndConditions";
 import Faq from "./pages/settings/Faq";
 import About from "./pages/about";
 import ScrollToTop from "./components/ui/ScrollToTop";
+import CafePart from "./components/CafePart";
 
-const App = () => {
+const AppContent = () => {
+  const location = useLocation();
+  const isCafePage = location.pathname === "/cafe";
+
   return (
-    <Router>
-      <ScrollToTop />
-      <Header />
+    <>
+      {!isCafePage && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/products/:category/:subCategory?" element={<Filters />} />
         <Route path="/product-page" element={<ProductPage />} />
         <Route path="/about" element={<About />} />
-
+        <Route path="/cafe" element={<CafePart />} />
         <Route path="/sign-up" element={<SignUpLayout />}>
           <Route path="" element={<SignUpPhone />} />
           <Route path="verification" element={<SignUpVerification />} />
@@ -60,7 +64,16 @@ const App = () => {
           <Route path="order-information" element={<OrderInformation />} />
         </Route>
       </Routes>
-      <Footer />
+      {!isCafePage && <Footer />}
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <Router>
+      <ScrollToTop />
+      <AppContent />
     </Router>
   );
 };

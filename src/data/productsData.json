@@ -39,118 +39,110 @@
       "originalPrice": "₹14,999",
       "discountedPrice": "₹11,999",
       "discount": "15%"
+    },
+    {
+      "image": "/images/product-img-1.jpg",
+      "name": "Mango Dress",
+      "description": "Kimono & Craftan - Colourful - Night Club fit",
+      "stars": 5,
+      "noOfReviews": "121",
+      "originalPrice": "₹14,999",
+      "discountedPrice": "₹11,999",
+      "discount": "15%"
+    },
+    {
+      "image": "/images/product-img-1.jpg",
+      "name": "Mango Dress",
+      "description": "Kimono & Craftan - Colourful - Night Club fit",
+      "stars": 5,
+      "noOfReviews": "121",
+      "originalPrice": "₹14,999",
+      "discountedPrice": "₹11,999",
+      "discount": "15%"
+    },
+    {
+      "image": "/images/product-img-1.jpg",
+      "name": "Mango Dress",
+      "description": "Kimono & Craftan - Colourful - Night Club fit",
+      "stars": 5,
+      "noOfReviews": "121",
+      "originalPrice": "₹14,999",
+      "discountedPrice": "₹11,999",
+      "discount": "15%"
+    },
+    {
+      "image": "/images/product-img-1.jpg",
+      "name": "Mango Dress",
+      "description": "Kimono & Craftan - Colourful - Night Club fit",
+      "stars": 5,
+      "noOfReviews": "121",
+      "originalPrice": "₹14,999",
+      "discountedPrice": "₹11,999",
+      "discount": "15%"
+    },
+    {
+      "image": "/images/product-img-1.jpg",
+      "name": "Mango Dress",
+      "description": "Kimono & Craftan - Colourful - Night Club fit",
+      "stars": 5,
+      "noOfReviews": "121",
+      "originalPrice": "₹14,999",
+      "discountedPrice": "₹11,999",
+      "discount": "15%"
+    },
+    {
+      "image": "/images/product-img-1.jpg",
+      "name": "Mango Dress",
+      "description": "Kimono & Craftan - Colourful - Night Club fit",
+      "stars": 5,
+      "noOfReviews": "121",
+      "originalPrice": "₹14,999",
+      "discountedPrice": "₹11,999",
+      "discount": "15%"
+    },
+    {
+      "image": "/images/product-img-1.jpg",
+      "name": "Mango Dress",
+      "description": "Kimono & Craftan - Colourful - Night Club fit",
+      "stars": 5,
+      "noOfReviews": "121",
+      "originalPrice": "₹14,999",
+      "discountedPrice": "₹11,999",
+      "discount": "15%"
+    },
+    {
+      "image": "/images/product-img-1.jpg",
+      "name": "Mango Dress",
+      "description": "Kimono & Craftan - Colourful - Night Club fit",
+      "stars": 5,
+      "noOfReviews": "121",
+      "originalPrice": "₹14,999",
+      "discountedPrice": "₹11,999",
+      "discount": "15%"
     }
   ],
   "discoverNewItemCards": [
     {
       "image": "/images/new-product-1.png",
-      "name": "Cool & Sexy Calvin Klein",
-      "description": "Dotted-Dress-Casual",
-      "price": "$89",
-      "discount": "20%"
+      "hoverImage": "/images/new-product-12.png",
+      "name": "Rock Trick",
+      "price": "₹119"
     },
     {
-      "image": "/images/new-product-2.png",
-      "name": "Cool & Sexy Calvin Klein",
-      "description": "Dotted-Dress-Casual",
-      "price": "$89",
-      "discount": ""
+      "image": "/images/new-product-1.png",
+      "hoverImage": "/images/new-product-12.png",
+      "name": "Rock Trick",
+      "price": "₹119"
     },
     {
-      "image": "/images/new-product-3.png",
-      "name": "Beige Coat Zara",
-      "description": "Cream-Brown-Formal",
-      "price": "$102",
-      "discount": "50%"
+      "image": "/images/new-product-1.png",
+      "hoverImage": "/images/new-product-12.png",
+      "name": "Rock Trick",
+      "price": "₹119"
     }
   ],
 
   "justForYouCards": [
-    {
-      "image": "/images/product-img-1.jpg",
-      "name": "Mango Dress",
-      "description": "Kimono & Craftan - Colourful - Night Club fit",
-      "stars": 5,
-      "noOfReviews": "121",
-      "originalPrice": "₹14,999",
-      "discountedPrice": "₹11,999",
-      "discount": "15%"
-    },
-    {
-      "image": "/images/product-img-1.jpg",
-      "name": "Mango Dress",
-      "description": "Kimono & Craftan - Colourful - Night Club fit",
-      "stars": 5,
-      "noOfReviews": "121",
-      "originalPrice": "₹14,999",
-      "discountedPrice": "₹11,999",
-      "discount": "15%"
-    },
-    {
-      "image": "/images/product-img-1.jpg",
-      "name": "Mango Dress",
-      "description": "Kimono & Craftan - Colourful - Night Club fit",
-      "stars": 5,
-      "noOfReviews": "121",
-      "originalPrice": "₹14,999",
-      "discountedPrice": "₹11,999",
-      "discount": "15%"
-    },
-    {
-      "image": "/images/product-img-1.jpg",
-      "name": "Mango Dress",
-      "description": "Kimono & Craftan - Colourful - Night Club fit",
-      "stars": 5,
-      "noOfReviews": "121",
-      "originalPrice": "₹14,999",
-      "discountedPrice": "₹11,999",
-      "discount": "15%"
-    }
-  ],
-  "giftOptionCards": [
-    {
-      "image": "/images/gift-product-1.png",
-      "name": "Mango hamper",
-      "description": "Kimono & Caftan - Black - Regular fit",
-      "stars": 5,
-      "noOfReviews": "289",
-      "originalPrice": "$290",
-      "discountedPrice": "$228",
-      "discount": "10%"
-    },
-    {
-      "image": "/images/gift-product-2.png",
-      "name": "Zara hamper",
-      "description": "Midi top- Daily fit",
-      "stars": 5,
-      "noOfReviews": "523",
-      "originalPrice": "$145",
-      "discountedPrice": "$95",
-      "discount": "7%"
-    },
-    {
-      "image": "/images/gift-product-3.png",
-      "name": "Uniqlo hamper",
-      "description": "Midi atlas Slim fit - bohemian",
-      "stars": 5,
-      "noOfReviews": "86",
-      "originalPrice": "$156",
-      "discountedPrice": "$125",
-      "discount": "8%"
-    },
-    {
-      "image": "/images/gift-product-4.png",
-      "name": "Mango dress hamper",
-      "description": "Kimono & Caftan - Colorful - Night club fit",
-      "stars": 5,
-      "noOfReviews": "121",
-      "originalPrice": "$487",
-      "discountedPrice": "$365",
-      "discount": "15%"
-    }
-  ],
-
-  "wishListCards": [
     {
       "image": "/images/product-img-1.jpg",
       "name": "Mango Dress",

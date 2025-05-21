@@ -23,7 +23,7 @@ const ProductCard = ({
 
   return (
     <div
-      className="group relative w-full max-w-[250px] cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+      className="group relative w-[160px] sm:w-[200px] md:w-[220px] lg:w-[250px] cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md flex-shrink-0"
       onClick={() => navigate("/product-page")}
     >
       <div className="relative aspect-square overflow-hidden">
@@ -45,9 +45,9 @@ const ProductCard = ({
         </div>
       </div>
 
-      <div className="p-4">
-        <h3 className="mb-1 text-lg font-semibold text-gray-800">{name}</h3>
-        <p className="mb-2 text-sm text-gray-600 line-clamp-2">{description}</p>
+      <div className="p-3 md:p-4">
+        <h3 className="mb-1 text-base md:text-lg font-semibold text-gray-800 line-clamp-1">{name}</h3>
+        <p className="mb-2 text-xs md:text-sm text-gray-600 line-clamp-2">{description}</p>
         <div className="flex items-center justify-between">
           <div>
             <span className="text-lg font-bold text-gray-900">{discountedPrice}</span>

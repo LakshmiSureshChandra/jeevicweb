@@ -27,6 +27,7 @@ const Header = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState(null);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const parsedData = JSON.parse(localStorage.getItem("userData"));
 
@@ -161,19 +162,6 @@ const Header = () => {
                               </span>
                             </Link>
                           ))}
-
-                          {/* View All Category */}
-                          <Link
-                            to={`/category/${category.title.toLowerCase().replace(/\s+/g, '-')}`}
-                            className="flex flex-col items-center gap-1.5 group/item hover:text-blue transition-colors"
-                          >
-                            <div className="aspect-square overflow-hidden flex items-center justify-center rounded-lg w-20 h-20">
-                              <ArrowRight01Icon className="w-8 h-8 text-blue group-hover/item:scale-105 transition-transform duration-300" />
-                            </div>
-                            <span className="text-xs font-medium text-center w-full">
-                              View All {category.title}
-                            </span>
-                          </Link>
                         </div>
                       </div>
                     </div>
@@ -195,10 +183,36 @@ const Header = () => {
             <Search01Icon className="w-5 h-5 text-gray-500 cursor-pointer hover:text-blue transition-colors" />
           </div>
 
-          {/* Mobile Search Icon */}
-          <button className="md:hidden">
-            <Search01Icon className="w-6 h-6" />
-          </button>
+          {/* Mobile Search Icon and Overlay */}
+          <div className="md:hidden">
+            <button onClick={() => setIsMobileSearchOpen(true)}>
+              <Search01Icon className="w-6 h-6" />
+            </button>
+
+            {/* Mobile Search Overlay */}
+            <div className={`
+              fixed inset-0 bg-white z-50 transition-all duration-300
+              ${isMobileSearchOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}
+            `}>
+              <div className="flex items-center justify-between p-4 border-b">
+                <div className="flex-1 flex items-center bg-gray-50 rounded-lg px-4 py-2 mr-4">
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    className="bg-transparent outline-none text-sm w-full"
+                    autoFocus
+                  />
+                  <Search01Icon className="w-5 h-5 text-gray-500" />
+                </div>
+                <button 
+                  onClick={() => setIsMobileSearchOpen(false)}
+                  className="p-2"
+                >
+                  <MultiplicationSignIcon className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+          </div>
 
           {/* Sign In Button */}
           <button className="flex items-center gap-2 hover:text-blue transition-colors">

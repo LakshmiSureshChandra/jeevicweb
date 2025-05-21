@@ -5,8 +5,8 @@ const Hero = () => {
   const [heroData] = useState({
     mediaType: 'video',
     mediaUrl: 'https://jeevic-prod.s3.ap-south-1.amazonaws.com/jv-uploads/productvideo.mp4',
-    title: 'Kimonos, Caftans & Pareos',
-    description: 'Poolside glam included From $4.99',
+    title: 'All the drinks you desire',
+    description: 'starting From 199',
     buttonText: 'SHOP NOW'
   });
 
@@ -37,9 +37,9 @@ const Hero = () => {
         )}
       </div>
 
-      <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-white p-8">
-        <h2 className="text-4xl font-semibold mb-4">{heroData.title}</h2>
-        <p className="text-2xl mb-6">{heroData.description}</p>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-8">
+        <h2 className="text-4xl text-center font-semibold mb-4">{heroData.title}</h2>
+        <p className="text-2xl text-center mb-6">{heroData.description}</p>
         <button className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition-colors">
           {heroData.buttonText}
         </button>

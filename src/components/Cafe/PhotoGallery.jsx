@@ -10,7 +10,7 @@ const PhotoGallery = () => {
   ];
 
   return (
-    <div className="grid grid-cols-12 gap-1 overflow-hidden h-[300px] md:h-[400px]">
+    <div className="grid grid-cols-12 gap-1 overflow-hidden h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px]">
       <div className="col-span-7 md:col-span-8 h-full">
         <img 
           src={images[0]} 

@@ -64,13 +64,15 @@ const DiningOffers = () => {
   }, [isDragging, startX, scrollLeft]);
 
   const getCardClasses = (cardId) => {
-    const baseClasses = "rounded-lg overflow-hidden flex-shrink-0 h-36 cursor-pointer transition-all duration-200";
-    const mobileClasses = "md:max-w-56 w-[60vw] md:w-full"; 
+    const baseClasses = "rounded-lg overflow-hidden cursor-pointer transition-all duration-200";
+    const mobileClasses = "w-[60vw] h-36 flex-shrink-0";
+    const tabletClasses = "md:w-full md:h-48";
+    const desktopClasses = "lg:h-full"; 
     
     if (cardId === activeCard) {
-      return `${baseClasses} ${mobileClasses} bg-blue-600 text-white border border-blue-600`;
+      return `${baseClasses} ${mobileClasses} ${tabletClasses} ${desktopClasses} bg-blue-600 text-white border border-blue-600`;
     }
-    return `${baseClasses} ${mobileClasses} bg-white border border-gray-200`;
+    return `${baseClasses} ${mobileClasses} ${tabletClasses} ${desktopClasses} bg-white border border-gray-200`;
   };
 
   const getTextColor = (cardId, defaultColor = "text-gray-600") => {
@@ -96,9 +98,9 @@ const DiningOffers = () => {
   );
 
   return (
-    <div className="md:border md:border-gray-200 rounded-lg md:p-6">
-      <h2 className="text-xl font-semibold mb-1">Dining Offers</h2>
-      <p className="text-sm text-gray-600 mb-4">
+    <div className="md:border md:border-gray-200 rounded-lg md:p-6 lg:p-8">
+      <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-1 md:mb-2 lg:mb-3">Dining Offers</h2>
+      <p className="text-sm md:text-base lg:text-lg text-gray-600 mb-4 md:mb-5 lg:mb-6">
         <span className="md:inline">Tap on any offer to know more</span>
         <span className="inline md:hidden"> • Swipe to see more</span>
       </p>
@@ -177,77 +179,47 @@ const DiningOffers = () => {
         </div>
       </div>
 
-      {/* Desktop grid layout (unchanged) */}
-      <div className="hidden md:grid md:grid-cols-3 gap-4">
-        <div 
-          className={getCardClasses(1)}
-          onClick={() => handleCardClick(1)}
-        >
-          <div className="p-4 relative">
-            <div className="mb-2 relative z-10">
-              <span className={`text-sm font-medium ${getTextColor(1, "text-blue-600")}`}>PRE-BOOK OFFER</span>
+      {/* Tablet and Desktop grid layout */}
+      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 lg:gap-6">
+        {[1, 2, 3, 4].map((cardId) => (
+          <div 
+            key={cardId}
+            className={getCardClasses(cardId)}
+            onClick={() => handleCardClick(cardId)}
+          >
+            <div className="p-4 md:p-5 lg:p-6 relative h-full flex flex-col justify-between">
+              <div>
+                <div className="mb-2 md:mb-3 relative z-10">
+                  <span className={`text-sm md:text-base lg:text-lg font-medium ${getTextColor(cardId, "text-blue-600")}`}>
+                    {cardId === 1 ? "PRE-BOOK OFFER" :
+                     cardId === 2 ? "SURPRISE" :
+                     cardId === 3 ? "EXCLUSIVE OFFER" : "BANK OFFER"}
+                  </span>
+                </div>
+                <div className="relative z-10">
+                  <h3 className="text-lg md:text-xl lg:text-2xl font-medium mb-1 md:mb-2">
+                    {cardId === 1 ? "Flat 15% OFF" :
+                     cardId === 2 ? "Get a scratch card" :
+                     cardId === 3 ? "Flat 10% OFF" :
+                     "20% OFF up to ₹1200 on Credit Cards"}
+                  </h3>
+                  <p className={`text-xs md:text-sm lg:text-base ${getTextColor(cardId, "text-blue-600")}`}>
+                    {cardId === 1 ? "Valid from 12PM to 11:55PM 12 May" :
+                     cardId === 2 ? "after every transaction" :
+                     cardId === 3 ? "valid on your next dining payment" :
+                     "and more with other banks"}
+                  </p>
+                  {cardId === 1 && (
+                    <p className={`text-xs md:text-sm lg:text-base mt-1 md:mt-2 ${getTextColor(cardId, "text-blue-600")}`}>
+                      Booking required
+                    </p>
+                  )}
+                </div>
+              </div>
+              <BackgroundSVG isActive={activeCard === cardId} />
             </div>
-            <div className="relative z-10">
-              <h3 className="text-lg font-medium mb-1">Flat 15% OFF</h3>
-              <p className={`text-xs ${getTextColor(1, "text-blue-600")}`}>Valid from 12PM to 11:55PM 12 May</p>
-              <p className={`text-xs ${getTextColor(1, "text-blue-600")}`}>Booking required</p>
-            </div>
-            <BackgroundSVG isActive={activeCard === 1} />
           </div>
-        </div>
-        
-        <div 
-          className={getCardClasses(2)}
-          onClick={() => handleCardClick(2)}
-        >
-          <div className="p-4 relative">
-            <div className="mb-2 relative z-10">
-              <span className={`text-sm font-medium ${getTextColor(2, "text-blue-600")}`}>SURPRISE</span>
-            </div>
-            <div className="relative z-10">
-              <h3 className="text-lg font-medium mb-1">Get a scratch card</h3>
-              <p className={`text-sm ${getTextColor(2, "text-blue-600")}`}>after every transaction</p>
-            </div>
-            <BackgroundSVG isActive={activeCard === 2} />
-          </div>
-        </div>
-        
-        <div 
-          className={getCardClasses(3)}
-          onClick={() => handleCardClick(3)}
-        >
-          <div className="p-4 relative">
-            <div className="mb-2 relative z-10">
-              <span className={`text-sm font-medium ${getTextColor(3, "text-blue-600")}`}>EXCLUSIVE OFFER</span>
-            </div>
-            <div className="relative z-10">
-              <h3 className="text-lg font-medium mb-1">Flat 10% OFF</h3>
-              <p className={`text-sm ${getTextColor(3, "text-gray-600")}`}>valid on your next dining payment</p>
-            </div>
-            <BackgroundSVG isActive={activeCard === 3} />
-          </div>
-        </div>
-      </div>
-      
-      <div 
-        className="hidden md:block"
-        style={{marginTop: '1rem'}}
-      >
-        <div 
-          className={getCardClasses(4)}
-          onClick={() => handleCardClick(4)}
-        >
-          <div className="p-4 relative">
-            <div className="mb-1 relative z-10">
-              <span className={`text-sm font-medium ${getTextColor(4, "text-blue-600")}`}>BANK OFFER</span>
-            </div>
-            <div className="relative z-10">
-              <h3 className="font-medium text-base">20% OFF up to ₹1200 on Credit Cards</h3>
-              <p className={`text-sm ${getTextColor(4, "text-blue-600")}`}>and more with other banks</p>
-            </div>
-            <BackgroundSVG isActive={activeCard === 4} />
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

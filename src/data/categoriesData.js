@@ -2,20 +2,52 @@ const categoriesData = [
   {
     title: "Shoe and Bag",
     items: [
-      { category: "Casual Shoes", link: "/products/shoe-and-bag/casual-shoes" },
-      { category: "Boots", link: "/products/shoe-and-bag/boots" },
-      { category: "Sandals", link: "/products/shoe-and-bag/sandals" },
-      { category: "Slippers", link: "/products/shoe-and-bag/slippers" },
+      { 
+        category: "Casual Shoes", 
+        link: "/products/shoe-and-bag/casual-shoes",
+        image: "/images/categories/casual-shoes.png"
+      },
+      { 
+        category: "Boots", 
+        link: "/products/shoe-and-bag/boots",
+        image: "/images/categories/boots.png"
+      },
+      { 
+        category: "Sandals", 
+        link: "/products/shoe-and-bag/sandals",
+        image: "/images/categories/sandals.png"
+      },
+      { 
+        category: "Slippers", 
+        link: "/products/shoe-and-bag/slippers",
+        image: "/images/categories/slippers.png"
+      },
     ],
     class: "",
   },
   {
     title: "Electronics",
     items: [
-      { category: "Mobile Phone", link: "/products/electronics/mobile-phone" },
-      { category: "Cable", link: "/products/electronics/cable" },
-      { category: "Hair Dresser", link: "/products/electronics/hair-dresser" },
-      { category: "Headphones", link: "/products/electronics/headphones" },
+      { 
+        category: "Mobile Phone", 
+        link: "/products/electronics/mobile-phone",
+        image: "/images/categories/mobile-phone.png"
+      },
+      { 
+        category: "Cable", 
+        link: "/products/electronics/cables",
+        image: "/images/categories/cables.png"
+      },
+      { 
+        category: "Hair Dryer", 
+        link: "/products/electronics/hair-dryer",
+        image: "/images/categories/hair-dryer.png"
+      },
+      { 
+        category: "Headphones", 
+        link: "/products/electronics/headphones",
+        image: "/images/categories/headphones.png"
+      },
     ],
     class: "",
   },
@@ -25,98 +57,22 @@ const categoriesData = [
       {
         category: "Event & Party",
         link: "/products/party-supplies/event-and-party",
+        image: "/images/categories/event-and-party.png"
       },
-      { category: "Christmas", link: "/products/party-supplies/christmas" },
+      { 
+        category: "Christmas", 
+        link: "/products/party-supplies/christmas",
+        image: "/images/categories/christmas.png"
+      },
       {
         category: "Artificial Decorations",
         link: "/products/party-supplies/artificial-decorations",
+        image: "/images/categories/artificial-decorations.png"
       },
-      { category: "Wedding", link: "/products/party-supplies/wedding" },
-    ],
-    class: "",
-  },
-  {
-    title: "Clothes",
-    items: [
-      { category: "Bottoms", link: "/products/clothes/bottoms" },
-      {
-        category: "Women's Clothing",
-        link: "/products/clothes/womens-clothing",
-      },
-      {
-        category: "T-Shirts and Tops",
-        link: "/products/clothes/t-shirts-and-tops",
-      },
-      { category: "Dresses", link: "/products/clothes/dresses" },
-      { category: "Outerwear", link: "/products/clothes/outerwear" },
-      { category: "Formal Wear", link: "/products/clothes/formal-wear" },
-      { category: "Casual Wear", link: "/products/clothes/casual-wear" },
-      {
-        category: "Seasonal Collections",
-        link: "/products/clothes/seasonal-collections",
-      },
-      { category: "Sports Bras", link: "/products/clothes/sports-bras" },
-      { category: "Workout Tops", link: "/products/clothes/workout-tops" },
-      { category: "Fall Wardrobe", link: "/products/clothes/fall-wardrobe" },
-    ],
-    class: "row-span-2",
-  },
-  {
-    title: "Luxury & Designer",
-    items: [
-      { category: "Towels", link: "/products/luxury-and-designer/towels" },
-      {
-        category: "Bathroom Scales",
-        link: "/products/luxury-and-designer/bathroom-scales",
-      },
-      {
-        category: "Bath Mats",
-        link: "/products/luxury-and-designer/bath-mats",
-      },
-      {
-        category: "Shower Caps",
-        link: "/products/luxury-and-designer/shower-caps",
-      },
-    ],
-    class: "",
-  },
-  {
-    title: "Cosmetics",
-    items: [
-      {
-        category: "Shampoo and Conditioner",
-        link: "/products/cosmetics/shampoo-and-conditioner",
-      },
-      {
-        category: "Styling Products",
-        link: "/products/cosmetics/styling-products",
-      },
-      {
-        category: "Hair Accessories",
-        link: "/products/cosmetics/hair-accessories",
-      },
-      { category: "Men's Grooming", link: "/products/cosmetics/mens-grooming" },
-    ],
-    class: "",
-  },
-  {
-    title: "Sport & Outdoors",
-    items: [
-      {
-        category: "Team Sports",
-        link: "/products/sport-and-outdoors/team-sports",
-      },
-      {
-        category: "Water Sports",
-        link: "/products/sport-and-outdoors/water-sports",
-      },
-      {
-        category: "Outdoor Recreation",
-        link: "/products/sport-and-outdoors/outdoor-recreation",
-      },
-      {
-        category: "Fitness Equipment",
-        link: "/products/sport-and-outdoors/fitness-equipment",
+      { 
+        category: "Wedding", 
+        link: "/products/party-supplies/wedding",
+        image: "/images/categories/wedding.png"
       },
     ],
     class: "",

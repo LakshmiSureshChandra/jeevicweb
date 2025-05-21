@@ -21,18 +21,6 @@ const DirectionMap = () => {
       </div>
       <div className="p-3">
         <p className="text-sm text-gray-700">Plot 365, 6/4, Road 10, Jubilee Hills, Hyderabad</p>
-        
-        <div className="flex mt-3 space-x-2">
-          <button className="flex items-center space-x-1 px-3 py-1 border border-gray-300 rounded-md text-sm">
-            <FaCopy className='text-gray-700' />
-            <span>Copy</span>
-          </button>
-          
-          <button className="flex items-center space-x-1 px-3 py-1 border border-gray-300 rounded-md text-sm">
-            <FaDirections className='text-red-700' />
-            <span>Direction</span>
-          </button>
-        </div>
       </div>
     </div>
   );

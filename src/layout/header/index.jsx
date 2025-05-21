@@ -10,13 +10,16 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, Popover } from "radix-ui";
 import categoriesData from "../../data/categoriesData";
-import CategoriesMenu from "./CategoriesMenu";
 import SettingsMenu from "./SettingsMenu";
 import CartMenu from "./CartMenu";
 import cardData from "../../data/cartData";
 import settingsData from "../../data/settingsData";
 
 const Header = () => {
+  // Add new state for active category
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(null);
+  const timeoutRef = useRef(null);
   const [popupActive, setPopupActive] = useState(false);
   const [isHamOpen, setIsHamOpen] = useState(false);
   const [cafeTransition, setCafeTransition] = useState(false);
@@ -44,10 +47,10 @@ const Header = () => {
 
   const handleCafeClick = (e) => {
     e.preventDefault();
-    
+
     // Start the animation
     setCafeTransition(true);
-    
+
     // Wait for the animation to complete before navigating
     setTimeout(() => {
       setCafeTransition(false);
@@ -55,183 +58,147 @@ const Header = () => {
     }, 800); // Duration slightly longer than the animation
   };
 
+  const handleMouseEnter = (category) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setDropdownVisible(true);
+    setActiveCategory(category);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setDropdownVisible(false);
+      setActiveCategory(null);
+    }, 1000);
+  };
+
   return (
-    <header
-      className="relative flex w-full justify-center lg:justify-end"
-      ref={headerRef}
-    >
+    <header className="relative flex h-20 w-full justify-center lg:justify-end" ref={headerRef}>
       {/* Cafe transition overlay */}
-      <div 
+      <div
         className={`fixed inset-0 z-50 bg-blue-600 transition-all duration-700 flex items-center justify-center ${
           cafeTransition ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className={`text-white text-6xl font-bold transition-transform duration-500 ${
+        <div className={`text-white text-6xl font-semibold transition-transform duration-500 ${
           cafeTransition ? "scale-100" : "scale-50"
         }`}>
           Jeevic Cafe
         </div>
       </div>
 
-      <div className="z-20 hidden w-[95%] items-center justify-between bg-white py-6 lg:flex">
-        <Link
-          to="/"
-          onClick={() => setPopupActive(false)}
-          className="text-[40px] font-semibold text-black"
-        >
-          Jeevic
-        </Link>
-
-        <div className="flex rounded-[4px] border-1 border-[#D9D9D9] p-2">
-          <input
-            type="text"
-            className="pr-3 outline-none"
-            placeholder="Search Products"
-          />
-          <CategoriesMenu categoriesData={categoriesData} />
-          <button className="ml-4 cursor-pointer">
-            <Search01Icon />
-          </button>
-        </div>
-
-        <nav>
-          <ul className="flex gap-3 xl:gap-8">
-            {parsedData ? (
-              <>
-                <li>
-                  <SettingsMenu dropDownData={settingsData}>
-                    <UserIcon aria-hidden />
-                    <span className="hidden xl:block">
-                      {parsedData.firstName}
-                    </span>
-                  </SettingsMenu>
-                </li>
-                <li>
-                  <Link
-                    to="/products/wishlist"
-                    className="flex cursor-pointer items-center gap-2"
-                  >
-                    <FavouriteIcon />
-                    <span className="hidden xl:block">Favourites</span>
-                  </Link>
-                </li>
-              </>
-            ) : (
-              <li>
-                <button
-                  className="flex cursor-pointer items-center gap-2"
-                  onClick={() => {
-                    setPopupActive(!popupActive);
-                  }}
-                >
-                  <UserIcon aria-hidden />
-                  <span className="hidden xl:block">Sign In</span>
-                </button>
-              </li>
-            )}
-
-            <li className="flex gap-3">
-              <CartMenu cartProducts={cardData} />
-              <div className="hidden aspect-square w-[25px] items-center justify-center rounded-full bg-[#FF7A00] xl:flex">
-                3
-              </div>
-            </li>
-          </ul>
-        </nav>
-
-        <button 
-          onClick={handleCafeClick}
-          className="bg-blue flex h-fit items-center rounded-l-[5px] px-16 py-3 text-[30px] font-bold text-white transition-all duration-300 hover:bg-blue-700"
-        >
-          Cafe
-        </button>
-      </div>
-
-      <div
-        className={`absolute z-10 flex h-full w-full items-center justify-center gap-16 bg-[#fff] transition-all duration-300 ${!popupActive && "pointer-events-none"}`}
-        style={{
-          transform: popupActive ? "translateY(100%)" : "translateY(95%)",
-          opacity: popupActive ? "100" : "0",
-        }}
-      >
-        <Link
-          to="/sign-up"
-          tabIndex={popupActive ? 0 : -1}
-          onClick={() => setPopupActive(false)}
-          className="flex h-[50px] w-[400px] cursor-pointer items-center justify-center rounded-[6px] border border-black bg-transparent text-2xl font-medium"
-        >
-          Login
-        </Link>
-        <Link
-          to="/sign-up"
-          tabIndex={popupActive ? 0 : -1}
-          onClick={() => setPopupActive(false)}
-          className="bg-blue flex h-[50px] w-[400px] cursor-pointer items-center justify-center rounded-[6px] text-2xl font-medium text-white"
-        >
-          Sign Up
-        </Link>
-      </div>
-
-      <div className="flex w-[90%] flex-col gap-6 py-4 lg:hidden">
-        <div className="flex w-full items-center justify-between">
-          <SettingsMenu dropDownData={settingsData}>
-            <button
-              onClick={() => {
-                setIsHamOpen(!isHamOpen);
-              }}
-              className="cursor-pointer"
-            >
-              {isHamOpen ? <MultiplicationSignIcon /> : <Menu01Icon />}
-            </button>
-          </SettingsMenu>
+      <div className="w-[95%] items-center justify-between bg-white flex">
+        <div className="flex items-center gap-12">
           <Link
             to="/"
             onClick={() => setPopupActive(false)}
-            className="text-3xl font-semibold text-black"
+            className="flex items-center h-12"
           >
-            Jeevic
+            <img 
+              src="/jeeviclogo.png" 
+              alt="Jeevic Logo"
+              className="h-12 w-auto object-contain"
+            />
           </Link>
-          <nav>
-            <ul className="flex gap-3 xl:gap-8">
-              <li>
-                <Link
-                  to="/products/wishlist"
-                  className="flex cursor-pointer items-center gap-2"
-                >
-                  <FavouriteIcon />
-                  <span className="hidden xl:block">Favourites</span>
-                </Link>
-              </li>
 
-              <li className="flex gap-3">
-                <CartMenu cartProducts={cardData} />
-                <div className="hidden aspect-square w-[25px] items-center justify-center rounded-full bg-[#FF7A00] xl:flex">
-                  3
-                </div>
-              </li>
+          {/* Main Categories Navigation */}
+          <nav className="static">
+            <ul className="flex items-center gap-8">
+              {categoriesData.map((category, index) => (
+                <li
+                  key={index}
+                  className="group"
+                  onMouseEnter={() => handleMouseEnter(category)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <Link 
+                    to={`/category/${category.title.toLowerCase().replace(/\s+/g, '-')}`}
+                    className="text-dark hover:text-blue transition-colors text-sm xl:text-base whitespace-nowrap py-4 block"
+                  >
+                    {category.title}
+                  </Link>
+
+                  {activeCategory === category && (
+                    <div
+                      className={`
+                        fixed left-0 top-[80px] z-50 w-screen bg-white shadow-md 
+                        transition-all duration-300 ease-in-out
+                        ${dropdownVisible ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-[-8px]'}
+                      `}
+                    >
+                      <div className="max-w-[1440px] mx-auto px-6 py-4">
+                        <div className="grid grid-cols-8 gap-3">
+                        {category.items.map((item, idx) => (
+                            <Link
+                              key={idx}
+                              to={typeof item === 'string' ? `/category/${item.toLowerCase().replace(/\s+/g, '-')}` : item.link}
+                              className="flex flex-col items-center gap-1.5 group/item hover:text-blue transition-colors"
+                            >
+                              <div className="aspect-square overflow-hidden w-20 h-20 flex items-center justify-center">
+                                <img
+                                  src={`/images/categories/${(typeof item === 'string' ? item : item.category).toLowerCase().replace(/\s+/g, '-')}.png`}
+                                  alt={typeof item === 'string' ? item : item.category}
+                                  className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+                              <span className="text-xs font-medium text-center w-full">
+                                {typeof item === 'string' ? item : item.category}
+                              </span>
+                            </Link>
+                          ))}
+
+                          {/* View All Category */}
+                          <Link
+                            to={`/category/${category.title.toLowerCase().replace(/\s+/g, '-')}`}
+                            className="flex flex-col items-center gap-1.5 group/item hover:text-blue transition-colors"
+                          >
+                            <div className="aspect-square overflow-hidden flex items-center justify-center rounded-lg w-20 h-20">
+                              <ArrowRight01Icon className="w-8 h-8 text-blue group-hover/item:scale-105 transition-transform duration-300" />
+                            </div>
+                            <span className="text-xs font-medium text-center w-full">
+                              View All {category.title}
+                            </span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
-
-        <div className="flex flex-col gap-3">
-          <div className="flex rounded-[4px] border-1 border-[#D9D9D9] p-2">
+        {/* Right side elements */}
+        <div className="flex items-center gap-6">
+          {/* Search Bar */}
+          <div className="flex items-center bg-gray-50 rounded-lg px-4 py-2">
             <input
               type="text"
-              className="w-full pr-3 text-sm outline-none placeholder:text-sm"
-              placeholder="Search"
+              placeholder="Search products..."
+              className="bg-transparent outline-none text-sm w-64"
             />
-            <CategoriesMenu categoriesData={categoriesData} />
-            <button className="ml-2 cursor-pointer sm:ml-4">
-              <Search01Icon />
-            </button>
+            <Search01Icon className="w-5 h-5 text-gray-500 cursor-pointer hover:text-blue transition-colors" />
           </div>
 
+          {/* Sign In Button */}
+          <button className="flex items-center gap-2 hover:text-blue transition-colors">
+            <UserIcon className="w-5 h-5" />
+            <span className="text-sm font-medium">Sign In</span>
+          </button>
+
+          {/* Cafe Toggle */}
           <button 
             onClick={handleCafeClick}
-            className="bg-blue flex w-full cursor-pointer justify-between rounded-[4px] px-3 py-2 font-bold text-white"
+            className="group relative flex items-center mr-4 gap-3 bg-gradient-to-r from-blue-600 to-blue-400 text-white px-6 py-2.5 rounded-full hover:shadow-lg transition-all duration-300 overflow-hidden"
           >
-            <span>CAFE</span>
-            <ArrowRight01Icon />
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+            
+            <span className="relative flex items-center gap-2 ">
+              <span className="text-sm font-medium relative">
+                Cafe
+              </span>
+            </span>
           </button>
         </div>
       </div>

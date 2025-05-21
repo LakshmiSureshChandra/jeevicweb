@@ -12,6 +12,7 @@ const colors = ["#750430", "#00A95D", "#A2D2FC", "#FF7A00"];
 
 const Hero = () => {
   const [quantity, setQuantity] = useState(1);
+  const [show360View, setShow360View] = useState(false);
 
   return (
     <section className="flex flex-col gap-8 lg:flex-row lg:gap-14">
@@ -122,9 +123,35 @@ const Hero = () => {
         </div>
 
         <div className="mt-8 flex flex-col gap-4 md:gap-5">
-          <button className="text-dark w-full cursor-pointer bg-[#FE770280] py-3 font-bold md:text-lg">
+          <button 
+            onClick={() => setShow360View(true)}
+            className="text-dark w-full cursor-pointer bg-[#FE770280] py-3 font-bold md:text-lg"
+          >
             Show 360 View
           </button>
+
+          {/* Modal for 360 view */}
+          {show360View && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="relative h-[80vh] w-[80vw] rounded-lg bg-white p-4">
+                <button
+                  onClick={() => setShow360View(false)}
+                  className="absolute right-4 top-4 text-2xl"
+                >
+                  ×
+                </button>
+                {/* Add your 360 viewer component here */}
+                <div className="h-full w-full">
+                  {/* Example: You can replace this with your actual 360 viewer */}
+                  <iframe
+                    src="/360-view.html" // Replace with your actual 360 view URL
+                    className="h-full w-full"
+                    title="360 degree view"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
           <div className="flex flex-col gap-4 sm:flex-row md:gap-5">
             <Link
               to="/checkout"

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 
-const ordersData = [
+const ecommerceOrders = [
   {
     images: [
       "/images/my-orders-1.png",
@@ -66,48 +66,109 @@ const ordersData = [
     noOfItems: 4,
   },
 ];
+const cafeOrders = [
+  {
+    orderId: "#CF123456",
+    items: ["Cappuccino", "Croissant"],
+    status: "Ready for pickup",
+    total: "$8.50",
+  },
+];
+const tableBookings = [
+  {
+    bookingId: "#TB789012",
+    date: "2023-06-15",
+    time: "19:00",
+    guests: 4,
+    status: "Confirmed",
+  },
+];
+
 const MyOrders = () => {
-  return (
-    <section className="flex w-full flex-col gap-6 rounded-[8px] bg-[rgba(9,102,178,0.1)] p-6">
-      {ordersData.map((orderData, i) => {
-        return (
-          <div key={i} className="flex w-full items-center justify-between">
-            <div className="grid aspect-square w-[100px] shrink-0 grid-cols-2 gap-1 rounded-xl bg-white p-1">
-              {orderData.images.map((image, i) => (
-                <img
-                  className="w-full rounded-[8px]"
-                  src={image}
-                  key={i}
-                  alt=""
-                />
-              ))}
-            </div>
+  const [activeTab, setActiveTab] = useState("ecommerce");
 
-            <span className="text-sm font-semibold text-[#202020]">
-              Order {orderData.orderId}
-            </span>
+  const renderTabs = () => (
+    <div className="flex space-x-4 mb-6">
+      <button
+        className={`px-4 py-2 rounded-lg ${activeTab === "ecommerce" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+        onClick={() => setActiveTab("ecommerce")}
+      >
+        E-commerce Orders
+      </button>
+      <button
+        className={`px-4 py-2 rounded-lg ${activeTab === "cafe" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+        onClick={() => setActiveTab("cafe")}
+      >
+        Cafe Orders
+      </button>
+      <button
+        className={`px-4 py-2 rounded-lg ${activeTab === "bookings" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+        onClick={() => setActiveTab("bookings")}
+      >
+        Table Bookings
+      </button>
+    </div>
+  );
 
-            <span className="text-sm font-medium text-[#202020]">
-              {orderData.deliveryType}
-            </span>
-
-            <span className="text-lg font-semibold text-[#202020]">
-              {orderData.status}
-            </span>
-
-            <div className="flex flex-col items-center justify-between gap-1">
-              <span className="rounded-[8px] bg-white p-1 text-center text-sm font-medium text-black">
-                {orderData.noOfItems} items
-              </span>
-              {orderData.status === "Delivered" && (
-                <button className="border-blue text-blue cursor-pointer rounded-xl border bg-transparent p-1 px-4 font-medium">
-                  Review
-                </button>
-              )}
-            </div>
+  const renderEcommerceOrders = () => (
+    <div className="space-y-4">
+      {ecommerceOrders.map((order, index) => (
+        <div key={index} className="bg-white p-4 rounded-lg shadow">
+          <div className="flex justify-between items-center">
+            <span className="font-semibold">Order {order.orderId}</span>
+            <span className="text-green-500">{order.status}</span>
           </div>
-        );
-      })}
+          <div className="mt-2">
+            {/* Replace the line causing the error */}
+            <p>{order.noOfItems} items</p>
+            {/* Remove or comment out this line if there's no total property */}
+            {/* <p className="font-bold mt-2">Total: {order.total}</p> */}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderCafeOrders = () => (
+    <div className="space-y-4">
+      {cafeOrders.map((order, index) => (
+        <div key={index} className="bg-white p-4 rounded-lg shadow">
+          <div className="flex justify-between items-center">
+            <span className="font-semibold">Order {order.orderId}</span>
+            <span className="text-green-500">{order.status}</span>
+          </div>
+          <div className="mt-2">
+            <p>{order.items.join(", ")}</p>
+            <p className="font-bold mt-2">Total: {order.total}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderTableBookings = () => (
+    <div className="space-y-4">
+      {tableBookings.map((booking, index) => (
+        <div key={index} className="bg-white p-4 rounded-lg shadow">
+          <div className="flex justify-between items-center">
+            <span className="font-semibold">Booking {booking.bookingId}</span>
+            <span className="text-blue-500">{booking.status}</span>
+          </div>
+          <div className="mt-2">
+            <p>Date: {booking.date} | Time: {booking.time}</p>
+            <p>Guests: {booking.guests}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <section className="w-full rounded-lg bg-gray-100 p-6">
+      {renderTabs()}
+      {activeTab === "ecommerce" && renderEcommerceOrders()}
+      {activeTab === "cafe" && renderCafeOrders()}
+      {activeTab === "bookings" && renderTableBookings()}
     </section>
   );
 };

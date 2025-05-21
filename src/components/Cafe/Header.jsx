@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UserIcon } from "hugeicons-react";
@@ -6,6 +6,13 @@ import { UserIcon } from "hugeicons-react";
 const Header = () => {
   const navigate = useNavigate();
   const [convenienceTransition, setConvenienceTransition] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in (you might want to use a more robust method)
+    const token = localStorage.getItem("jwtToken");
+    setIsLoggedIn(!!token);
+  }, []);
 
   const handleConvenienceClick = () => {
     setConvenienceTransition(true);
@@ -48,9 +55,12 @@ const Header = () => {
 
         <div className="flex items-center space-x-4">
           {/* Sign In Button */}
-          <button className="flex items-center gap-2 hover:text-blue transition-colors">
+          <button 
+            className="flex items-center gap-2 hover:text-blue transition-colors"
+            onClick={() => isLoggedIn ? navigate('/profile') : navigate('/sign-in')}
+          >
             <UserIcon className="w-5 h-5" />
-            <span className="text-sm font-medium">Sign In</span>
+            <span className="text-sm font-medium">{isLoggedIn ? 'Profile' : 'Sign In'}</span>
           </button>
         </div>
       </div>

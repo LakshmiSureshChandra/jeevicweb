@@ -73,31 +73,9 @@ const ReviewSlide = ({
               <h3 className="text-dark font-bold">{shortReview}</h3>
               <p className="text-sm text-[#9d9d9d]">By {author}</p>
             </div>
-            <div className="flex rounded border border-[#d9d9d9] py-1">
-              <button className="flex cursor-pointer items-center gap-1 border-r border-r-[#d9d9d9] px-2 sm:px-3">
-                <ThumbsUpIcon className="w-[20px]" />
-                <span className="text-sm sm:text-base">{likes}</span>
-              </button>
-              <button className="flex cursor-pointer items-center gap-1 px-2 sm:px-3">
-                <ThumbsDownIcon className="w-[20px]" />
-                <span className="text-sm sm:text-base">{dislikes}</span>
-              </button>
-            </div>
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <h4 className="text-sm text-[#9D9D9D] sm:min-w-[150px] md:text-base">
-                Advantages
-              </h4>
-              <p className="text-dark text-sm md:text-base">{advantages}</p>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <h4 className="text-sm text-[#9D9D9D] sm:min-w-[150px] md:text-base">
-                Disadvantages
-              </h4>
-              <p className="text-dark text-sm md:text-base">{disadvantages}</p>
-            </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <h4 className="text-sm text-[#9D9D9D] sm:min-w-[150px] md:text-base">
                 Review

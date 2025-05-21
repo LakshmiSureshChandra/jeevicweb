@@ -1,82 +1,59 @@
-import { UserIcon } from "hugeicons-react";
 import React from "react";
 
 const ContactUs = () => {
   return (
-    <section className="my-15 flex w-full">
-      <div className="bg-dark flex w-[50%] flex-col gap-8 p-13">
-        <h2 className="text-5xl leading-[120%] font-semibold text-white">
-          Tell us about your <span className="text-[#FFC94B]">Concerns</span>
-        </h2>
+    <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+      <h2 className="text-3xl font-semibold text-gray-800 mb-6">
+        Contact Support
+      </h2>
 
-        <form>
-          <div className="flex flex-col gap-8">
-            <div className="flex flex-col gap-3">
-              <label
-                htmlFor="contact-name"
-                className="font-semibold text-white"
-              >
-                Your Name
-              </label>
-              <div className="flex gap-3 rounded-[4px] border border-[#D9D9D9] px-2.5 py-4">
-                <UserIcon className="text-[#9D9D9D]" />
-                <input
-                  type="text"
-                  placeholder="Enter your name"
-                  id="contact-name"
-                  className="w-full text-[#9D9D9D] outline-none placeholder:text-[#9D9D9D90]"
-                />
-              </div>
-            </div>
+      <form className="space-y-6">
+        <div>
+          <label htmlFor="contact-name" className="block text-sm font-medium text-gray-700 mb-1">
+            Your Name
+          </label>
+          <input
+            type="text"
+            id="contact-name"
+            className="focus:ring-indigo-500 focus:border-indigo-500 block w-full px-4 py-2 sm:text-sm border-gray-300 rounded-md"
+            placeholder="Enter your name"
+          />
+        </div>
 
-            <div className="flex flex-col gap-3">
-              <label
-                htmlFor="contact-email"
-                className="font-semibold text-white"
-              >
-                Email
-              </label>
-              <div className="flex gap-3 rounded-[4px] border border-[#D9D9D9] px-2.5 py-4">
-                <UserIcon className="text-[#9D9D9D]" />
-                <input
-                  type="email"
-                  id="contact-email"
-                  placeholder="Enter your email"
-                  className="w-full text-[#9D9D9D] outline-none placeholder:text-[#9D9D9D90]"
-                />
-              </div>
-            </div>
+        <div>
+          <label htmlFor="contact-email" className="block text-sm font-medium text-gray-700 mb-1">
+            Email Address
+          </label>
+          <input
+            type="email"
+            id="contact-email"
+            className="focus:ring-indigo-500 focus:border-indigo-500 block w-full px-4 py-2 sm:text-sm border-gray-300 rounded-md"
+            placeholder="Enter your email"
+          />
+        </div>
 
-            <div className="flex flex-col gap-3">
-              <label
-                htmlFor="contact-description"
-                className="font-semibold text-white"
-              >
-                Description
-              </label>
-              <div className="flex gap-3 rounded-[4px] border border-[#D9D9D9] px-2.5 py-4">
-                <textarea
-                  type="text"
-                  id="contact-description"
-                  placeholder="Enter your description"
-                  className="min-h-[130px] w-full resize-none text-[#9D9D9D] outline-none placeholder:text-[#9D9D9D90]"
-                />
-              </div>
-            </div>
-          </div>
+        <div>
+          <label htmlFor="contact-message" className="block text-sm font-medium text-gray-700 mb-1">
+            Message
+          </label>
+          <textarea
+            id="contact-message"
+            rows="4"
+            className="focus:ring-indigo-500 focus:border-indigo-500 block w-full px-4 py-2 sm:text-sm border-gray-300 rounded-md"
+            placeholder="How can we help you?"
+          ></textarea>
+        </div>
 
-          <button className="bg-blue font-lato mt-8 w-full cursor-pointer py-4 text-center text-white uppercase">
-            Send
+        <div>
+          <button
+            type="submit"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Send Message
           </button>
-        </form>
-      </div>
-
-      <img
-        src="/images/hero-left.png"
-        className="w-[50%] object-cover object-center"
-        alt="girls showing dresses"
-      />
-    </section>
+        </div>
+      </form>
+    </div>
   );
 };
 

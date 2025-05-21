@@ -7,64 +7,39 @@ import {
   useLocation,
 } from "react-router-dom";
 import Header from "./layout/header/index";
-import SignUpLayout from "./layout/SignUpLayout";
-import SignUpPhone from "./pages/signup/SignUpPhone";
-import SignUpVerification from "./pages/signup/SignUpVerification";
-import SignUpDetails from "./pages/signup/SignUpDetails";
 import Home from "./pages/home";
 import Filters from "./pages/filters";
 import Footer from "./layout/Footer";
 import ProductPage from "./pages/product/index";
-import CheckoutLayout from "./layout/CheckoutLayout";
 import ViewCart from "./pages/checkout/ViewCart";
-import CustomerInfo from "./pages/checkout/CustomerInfo";
-import OrderInformation from "./pages/checkout/OrderInformation";
-import SettingsLayout from "./layout/SettingsLayout";
-import Profile from "./pages/settings/Profile";
-import MyOrders from "./pages/settings/MyOrders";
-import ShippingAddress from "./pages/settings/ShippingAddress";
-import JeevicPoints from "./pages/settings/JeevicPoints";
-import TermsAndConditions from "./pages/settings/TermsAndConditions";
-import Faq from "./pages/settings/Faq";
 import About from "./pages/about";
 import ScrollToTop from "./components/ui/ScrollToTop";
 import CafePart from "./components/CafePart";
+import OrderConfirmation from "./pages/checkout/OrderConfirmation";
+import SignIn from "./pages/signin/SignIn";
+import ProfileSettings from "./pages/settings/ProfileSettings";
 
 const AppContent = () => {
   const location = useLocation();
   const isCafePage = location.pathname === "/cafe";
+  const isSignInPage = location.pathname === "/sign-in";
 
   return (
     <>
-      {!isCafePage && <Header />}
+      {!isCafePage && !isSignInPage && <Header />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/products/:category/:subCategory?" element={<Filters />} />
         <Route path="/product-page" element={<ProductPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/cafe" element={<CafePart />} />
-        <Route path="/sign-up" element={<SignUpLayout />}>
-          <Route path="" element={<SignUpPhone />} />
-          <Route path="verification" element={<SignUpVerification />} />
-          <Route path="details" element={<SignUpDetails />} />
-        </Route>
 
-        <Route path="/settings" element={<SettingsLayout />}>
-          <Route path="profile" element={<Profile />} />
-          <Route path="my-orders" element={<MyOrders />} />
-          <Route path="shipping-address" element={<ShippingAddress />} />
-          <Route path="jeevic-points" element={<JeevicPoints />} />
-          <Route path="terms-and-conditions" element={<TermsAndConditions />} />
-          <Route path="faq" element={<Faq />} />
-        </Route>
-
-        <Route path="/checkout" element={<CheckoutLayout />}>
-          <Route path="" element={<ViewCart />} />
-          <Route path="customer-info" element={<CustomerInfo />} />
-          <Route path="order-information" element={<OrderInformation />} />
-        </Route>
+        <Route path="/checkout" element={<ViewCart />} />
+        <Route path="/checkout/confirmation" element={<OrderConfirmation />} />
+        <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/profile" element={<ProfileSettings />} />
       </Routes>
-      {!isCafePage && <Footer />}
+      {!isCafePage && !isSignInPage && <Footer />}
     </>
   );
 };

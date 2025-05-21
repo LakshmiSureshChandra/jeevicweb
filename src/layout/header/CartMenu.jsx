@@ -1,54 +1,42 @@
-import { ShoppingBag03Icon } from "hugeicons-react";
-import { Popover } from "radix-ui";
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
 
-const CartMenu = ({ cartProducts }) => {
+const CartMenu = ({ cartItems, updateQuantity, onCheckout }) => {
+  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
   return (
-    <Popover.Root>
-      <Popover.Trigger className="flex cursor-pointer items-center gap-2">
-        <ShoppingBag03Icon aria-hidden />
-        <span className="hidden xl:block">Cart</span>
-      </Popover.Trigger>
-
-      <Popover.Portal>
-        <Popover.Content className="z-20 mt-6 flex w-[300px] flex-col gap-5 rounded-[8px] bg-[#fff] p-5 shadow-[0px_0px_15px_0px_rgba(0,0,0,0.10)]">
-          <div className="flex flex-col gap-4">
-            {cartProducts.map((product, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-6 border-b border-b-[#D9D9D9] pb-4"
-              >
-                <img src={product.image} alt={product.name} />
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-lato text-dark text-sm font-bold">
-                    {product.name}
-                  </h3>
-                  <span className="font-lato text-[#555]">
-                    ${product.price.toFixed(2)}
-                  </span>
-                </div>
+    <div className="space-y-4">
+      <div className={`space-y-4 ${cartItems.length > 3 ? 'max-h-60 overflow-y-auto' : ''}`}>
+        {cartItems.map((item) => (
+          <div key={item.id} className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded" />
+              <div>
+                <p className="font-medium">{item.name}</p>
+                <p className="text-sm text-gray-500">${item.price.toFixed(2)}</p>
               </div>
-            ))}
+            </div>
+            <div className="flex items-center space-x-2">
+              <button onClick={() => updateQuantity(item.id, -1)} className="px-2  rounded-full bg-gray-200 hover:bg-gray-300 text-lg font-bold">
+                -
+              </button>
+              <span>{item.quantity}</span>
+              <button onClick={() => updateQuantity(item.id, 1)} className="px-2 rounded-full bg-gray-200 hover:bg-gray-300 text-lg font-bold">
+                +
+              </button>
+            </div>
           </div>
-
-          <p className="font-lato flex items-center gap-8">
-            <span className="text-sm font-bold text-[#555]">Total:</span>{" "}
-            <span className="text-dark font-extrabold">$130.09</span>
-          </p>
-          <div className="font-lato flex w-full items-center gap-2">
-            <Popover.Close asChild>
-              <Link
-                to="/checkout"
-                className="flex w-full cursor-pointer items-center justify-center rounded-[4px] border border-[#434343] bg-transparent py-2 font-bold text-[#434343]"
-              >
-                Checkout
-              </Link>
-            </Popover.Close>
-          </div>
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+        ))}
+      </div>
+      <div className="border-t pt-2">
+        <p className="font-bold text-right">Total: ${total.toFixed(2)}</p>
+      </div>
+      <button 
+        onClick={onCheckout}
+        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Checkout
+      </button>
+    </div>
   );
 };
 

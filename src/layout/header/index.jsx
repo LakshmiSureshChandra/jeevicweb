@@ -7,14 +7,15 @@ import {
   MultiplicationSignIcon,
   Search01Icon,
   UserIcon,
+  ShoppingBag01Icon,
 } from "hugeicons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, Popover } from "radix-ui";
 import categoriesData from "../../data/categoriesData";
 import SettingsMenu from "./SettingsMenu";
-import CartMenu from "./CartMenu";
 import cardData from "../../data/cartData";
 import settingsData from "../../data/settingsData";
+import CartMenu from "./CartMenu";
 
 const Header = () => {
   // Add new state for active category
@@ -28,6 +29,8 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [cartItems, setCartItems] = useState(cardData);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const parsedData = JSON.parse(localStorage.getItem("userData"));
 
@@ -76,6 +79,20 @@ const Header = () => {
       setActiveCategory(null);
     }, 1000);
   };
+
+  const updateCartQuantity = (id, change) => {
+    setCartItems(prevItems =>
+      prevItems.map(item =>
+        item.id === id ? { ...item, quantity: Math.max(0, item.quantity + change) } : item
+      )
+    );
+  };
+
+  useEffect(() => {
+    // Check if user is logged in (you might want to use a more robust method)
+    const token = localStorage.getItem("jwtToken");
+    setIsLoggedIn(!!token);
+  }, []);
 
   return (
     <header className="relative flex h-20 w-full justify-center lg:justify-end" ref={headerRef}>
@@ -214,11 +231,32 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Sign In Button */}
-          <button className="flex items-center gap-2 hover:text-blue transition-colors">
+          {/* Cart Button with Dropdown */}
+          <Popover.Root>
+            <Popover.Trigger className="flex items-center gap-2 hover:text-blue transition-colors">
+              <ShoppingBag01Icon className="w-5 h-5" />
+              <span className="text-sm font-medium hidden md:inline">Cart</span>
+            </Popover.Trigger>
+
+            <Popover.Content className="z-50 mt-2 bg-white rounded-lg shadow-lg p-4 w-72">
+              <CartMenu 
+                cartItems={cartItems} 
+                updateQuantity={updateCartQuantity} 
+                onCheckout={() => navigate('/checkout')}
+              />
+            </Popover.Content>
+          </Popover.Root>
+
+          {/* Sign In / Profile Button - Hidden on mobile */}
+          <button 
+            className="hidden lg:flex items-center gap-2 hover:text-blue transition-colors"
+            onClick={() => isLoggedIn ? navigate('/profile') : navigate('/sign-in')}
+          >
             <UserIcon className="w-5 h-5" />
-            <span className="text-sm font-medium">Sign In</span>
+            <span className="text-sm font-medium">{isLoggedIn ? 'Profile' : 'Sign In'}</span>
           </button>
+
+          {/* Remove the SettingsMenu component and its related code */}
 
           {/* Cafe Toggle */}
           <button 
@@ -248,8 +286,20 @@ const Header = () => {
         lg:hidden overflow-y-auto
       `}>
         <div className="p-4">
+          {/* Sign In / Profile Button for Mobile */}
+          <button 
+            className="flex items-center gap-2 w-full py-3 border-b"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              isLoggedIn ? navigate('/profile') : navigate('/sign-in');
+            }}
+          >
+            <UserIcon className="w-5 h-5" />
+            <span className="text-sm font-medium">{isLoggedIn ? 'Profile' : 'Sign In'}</span>
+          </button>
+
           {/* Mobile Categories */}
-          <div className="space-y-2">
+          <div className="space-y-2 mt-4">
             {categoriesData.map((category, index) => (
               <div key={index} className="border-b">
                 <button
@@ -257,6 +307,9 @@ const Header = () => {
                   onClick={() => setExpandedCategory(expandedCategory === category ? null : category)}
                 >
                   <span className="text-sm font-medium">{category.title}</span>
+                  <span className={`text-sm transition-transform ${expandedCategory === category ? 'rotate-180' : ''}`}>
+                    {expandedCategory === category ? '−' : '+'}
+                  </span>
                 </button>
                 
                 {expandedCategory === category && (

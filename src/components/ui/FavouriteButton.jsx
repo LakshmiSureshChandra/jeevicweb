@@ -27,7 +27,7 @@ const FavouriteButton = ({ liked, setLiked }) => {
     <button
       className={`p-2 rounded-full shadow-md transition-colors duration-200 ${
         liked ? 'bg-red-100' : 'bg-white hover:bg-gray-100'
-      }`}
+      } w-10 h-10 flex items-center justify-center`}
       onClick={(e) => {
         e.stopPropagation();
         setLiked(!liked);

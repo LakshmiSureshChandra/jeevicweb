@@ -22,14 +22,6 @@ const settingsData = {
         name: "Jeevic Points",
       },
       {
-        location: "/settings/terms-and-conditions",
-        name: "Terms and Conditions",
-      },
-      {
-        location: "/settings/faq",
-        name: "FAQ",
-      },
-      {
         location: "/settings/contact-us",
         name: "Contact Us",
       },

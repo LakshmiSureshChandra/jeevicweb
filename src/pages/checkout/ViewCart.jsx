@@ -1,43 +1,220 @@
-import { Delete02Icon, MinusSignIcon, PlusSignIcon } from "hugeicons-react";
 import React, { useState } from "react";
 import cartData from "../../data/cartData";
-import OrderSummary from "../../components/OrderSummary";
+import { Link } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const ViewCart = () => {
+  const [cart, setCart] = useState(cartData);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [usedPoints, setUsedPoints] = useState(0);
+
+  // Assume these values come from an API or user context
+  const availableCoupons = [
+    { code: 'SUMMER10', discount: 10 },
+    { code: 'NEWUSER20', discount: 20 },
+  ];
+  const userPoints = 500; // Assume 1 point = $0.01
+
+  const updateQuantity = (id, change) => {
+    setCart(prevCart =>
+      prevCart.map(item =>
+        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item
+      )
+    );
+  };
+
+  const removeItem = (id) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
+  };
+
+  const applyCoupon = (coupon) => {
+    setAppliedCoupon(coupon);
+  };
+
+  const applyPoints = (points) => {
+    setUsedPoints(Math.min(points, userPoints, total * 100)); // Limit points usage
+  };
+
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discountedTotal = appliedCoupon 
+    ? total * (1 - appliedCoupon.discount / 100) 
+    : total;
+  const finalTotal = Math.max(0, discountedTotal - usedPoints / 100);
+
+  const navigate = useNavigate();
+
+  const handleProceedToPayment = () => {
+    navigate('/checkout/confirmation');
+  };
+
+  const [manualCoupon, setManualCoupon] = useState('');
+
+  // Add this new function
+  const handleManualCoupon = () => {
+    const coupon = availableCoupons.find(c => c.code === manualCoupon);
+    if (coupon) {
+      applyCoupon(coupon);
+      setManualCoupon('');
+    } else {
+      // You might want to show an error message here
+      console.log('Invalid coupon code');
+    }
+  };
+
   return (
-    <section className="flex flex-col items-end justify-between gap-8 lg:flex-row lg:items-start xl:gap-12">
-      <div className="w-full">
-        <h2 className="text-dark text-xl font-bold">
-          Cart <span className="font-medium text-[#9D9D9D]">3</span>
-        </h2>
-        <div className="mt-8 flex flex-col gap-6">
-          {cartData.map((cartProduct, i) => {
-            return <ProductDisplay key={i} {...cartProduct} />;
-          })}
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Your Shopping Cart</h1>
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="w-full lg:w-2/3">
+          {cart.length > 0 ? (
+            <div className="bg-white rounded-lg shadow-md p-6">
+              {cart.map((item) => (
+                <CartItem
+                  key={item.id}
+                  item={item}
+                  updateQuantity={updateQuantity}
+                  removeItem={removeItem}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-md p-6 text-center">
+              <p className="text-xl text-gray-600">Your cart is empty</p>
+              <Link to="/" className="text-blue-600 hover:underline mt-4 inline-block">
+                Continue Shopping
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div className="w-full lg:w-1/3">
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
+            <div className="flex justify-between mb-2">
+              <span>Subtotal</span>
+              <span>${total.toFixed(2)}</span>
+            </div>
+            {appliedCoupon && (
+              <div className="flex justify-between mb-2 text-green-600">
+                <span>Coupon Discount</span>
+                <span>-${(total * appliedCoupon.discount / 100).toFixed(2)}</span>
+              </div>
+            )}
+            {usedPoints > 0 && (
+              <div className="flex justify-between mb-2 text-green-600">
+                <span>Points Applied</span>
+                <span>-${(usedPoints / 100).toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex justify-between mb-2">
+              <span>Shipping</span>
+              <span>FREE</span>
+            </div>
+            <div className="border-t border-gray-200 my-4"></div>
+            <div className="flex justify-between font-semibold text-lg">
+              <span>Total</span>
+              <span>${finalTotal.toFixed(2)}</span>
+            </div>
+            <button
+              onClick={handleProceedToPayment}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg mt-6 hover:bg-blue-700 transition-colors"
+              disabled={cart.length === 0}
+            >
+              Proceed to Checkout
+            </button>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 className="text-lg font-semibold mb-4">Available Coupons</h3>
+            {availableCoupons.map((coupon) => (
+              <div key={coupon.code} className="flex justify-between items-center mb-2">
+                <span>{coupon.code} - {coupon.discount}% off</span>
+                <button 
+                  onClick={() => applyCoupon(coupon)}
+                  className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm hover:bg-blue-200"
+                >
+                  Apply
+                </button>
+              </div>
+            ))}
+            <div className="mt-4">
+              <h4 className="text-md font-semibold mb-2">Enter Coupon Code</h4>
+              <div className="flex">
+                <input
+                  type="text"
+                  value={manualCoupon}
+                  onChange={(e) => setManualCoupon(e.target.value)}
+                  className="flex-grow border border-gray-300 rounded-l-lg p-2"
+                  placeholder="Enter coupon code"
+                />
+                <button
+                  onClick={handleManualCoupon}
+                  className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-semibold mb-4">Use Jeevic Points</h3>
+            <p className="mb-2">Available Points: {userPoints}</p>
+            <div className="flex items-center">
+              <input 
+                type="number" 
+                max={userPoints}
+                value={usedPoints}
+                onChange={(e) => applyPoints(Number(e.target.value))}
+                className="flex-grow border border-gray-300 rounded-l-lg p-2"
+              />
+              <button 
+                onClick={() => applyPoints(userPoints)}
+                className="bg-green-500 text-white px-4 py-2 rounded-r-lg hover:bg-green-600 transition-colors"
+              >
+                Apply Max
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="flex flex-col gap-10">
-        <OrderSummary link="/checkout/customer-info" buttonText="Next" />
-
-        <div className="flex">
-          <input
-            className="w-[70%] rounded-l-[4px] border border-[#7B7B7B] p-2 outline-none"
-            type="text"
-          />
-          <button className="bg-blue h-[56px] shrink-0 rounded-r-[4px] px-2.5 text-sm font-semibold text-nowrap text-white">
-            Browse Coupons
-          </button>
-        </div>
-
-        <div className="">
-          <Voucher />
-          <Voucher />
-        </div>
-      </div>
-    </section>
+    </div>
   );
 };
+
+const CartItem = ({ item, updateQuantity, removeItem }) => (
+  <div className="flex items-center border-b border-gray-200 py-4 last:border-b-0">
+    <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-md" />
+    <div className="ml-4 flex-grow">
+      <h3 className="font-semibold text-gray-800">{item.name}</h3>
+      <p className="text-sm text-gray-500">{item.description}</p>
+      <div className="flex items-center mt-2">
+        <button
+          onClick={() => updateQuantity(item.id, -1)}
+          className="text-gray-500 hover:text-gray-700 px-2 py-1 border rounded"
+        >
+          -
+        </button>
+        <span className="mx-2">{item.quantity}</span>
+        <button
+          onClick={() => updateQuantity(item.id, 1)}
+          className="text-gray-500 hover:text-gray-700 px-2 py-1 border rounded"
+        >
+          +
+        </button>
+      </div>
+    </div>
+    <div className="text-right">
+      <p className="font-semibold text-gray-800">${(item.price * item.quantity).toFixed(2)}</p>
+      <button
+        onClick={() => removeItem(item.id)}
+        className="text-red-500 hover:text-red-700 mt-2"
+      >
+        Remove
+      </button>
+    </div>
+  </div>
+);
 
 export default ViewCart;
 

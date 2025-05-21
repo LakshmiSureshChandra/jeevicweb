@@ -1,36 +1,48 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const Hero = () => {
+
+  const [heroData] = useState({
+    mediaType: 'video',
+    mediaUrl: 'https://jeevic-prod.s3.ap-south-1.amazonaws.com/jv-uploads/productvideo.mp4',
+    title: 'Kimonos, Caftans & Pareos',
+    description: 'Poolside glam included From $4.99',
+    buttonText: 'SHOP NOW'
+  });
+
   return (
-    <section className="hidden lg:flex">
-      <img src="/images/hero-left.png" alt="women dressed up showing clothes" />
+    <section className="relative w-full h-screen">
+      <div className="absolute inset-0">
+        {heroData.mediaType === 'image' ? (
+          <img 
+            src={heroData.mediaUrl} 
+            alt="Hero media" 
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <>
+            <video 
+              className="w-full h-full object-cover" 
+              src='https://jeevic-prod.s3.ap-south-1.amazonaws.com/jv-uploads/productvideo.mp4'
+              width="1440"
+              height="680"
+              autoPlay
+              playsInline
+              loop
+              muted
+            />
+            <div className="absolute bottom-8 right-8 flex gap-2">
+            </div>
+          </>
+        )}
+      </div>
 
-      <div
-        className="relative flex w-full flex-col items-center justify-center gap-8 bg-cover bg-no-repeat text-center text-white"
-        style={{ backgroundImage: 'url("/images/hero-right-bg.png")' }}
-      >
-        <h2 className="max-w-[14em] text-2xl font-semibold uppercase xl:max-w-none xl:text-[32px]">
-          Kimonos, Caftans & Pareos
-        </h2>
-
-        <p className="max-w-[14em] text-xl xl:max-w-none xl:text-[28px]">
-          Poolside glam included From $4.99
-        </p>
-
-        <button className="flex h-14 cursor-pointer items-center gap-2 rounded-[4px] bg-[#4172DC] px-14">
-          <img src="/images/package-icon.svg" alt="" role="presentation" />
-          <span>SHOP NOW</span>
+      <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-white p-8">
+        <h2 className="text-4xl font-semibold mb-4">{heroData.title}</h2>
+        <p className="text-2xl mb-6">{heroData.description}</p>
+        <button className="bg-blue-600 text-white px-8 py-3 rounded-full text-lg hover:bg-blue-700 transition-colors">
+          {heroData.buttonText}
         </button>
-
-        <div className="absolute top-1/2 left-0 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center bg-white text-xl font-semibold">
-          <h3 className="text-dark xl:px-8xl:pt-8 px-4 pt-6">
-            Summer Essentials
-          </h3>
-          <span className="pb-6 text-[#ff2e00]">20% off</span>
-          <p className="font-lato bg-dark w-full py-3 text-sm font-normal text-white">
-            19 Jul-30 Jul
-          </p>
-        </div>
       </div>
     </section>
   );

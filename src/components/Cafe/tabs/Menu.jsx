@@ -41,7 +41,7 @@ const MenuItem = ({ item, onAddToCart, quantity }) => (
 );
 
 const OrderCart = ({ cart, onClose, onUpdateQuantity }) => (
-  <div className="fixed bottom-16 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm w-full max-h-96 flex flex-col">
+  <div className="fixed bottom-16 right-4 bg-white rounded-lg shadow-lg p-4 max-w-sm w-full max-h-96 flex flex-col z-[9999]">
     <div className="flex justify-between items-center mb-4">
       <h3 className="font-semibold">Order Cart</h3>
       <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -175,7 +175,7 @@ const Menu = () => {
       {totalItems > 0 && !showCart && (
         <button
           onClick={() => setShowCart(true)}
-          className="fixed bottom-4 right-4 bg-orange-500 text-white rounded-full p-3 shadow-lg"
+          className="fixed bottom-4 right-4 bg-orange-500 text-white rounded-full p-3 shadow-lg z-[9999]"
         >
           <ShoppingCartIcon size={24} />
           <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">

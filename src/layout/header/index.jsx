@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { ChevronDown } from 'lucide-react';
 import {
   ArrowRight01Icon,
   FavouriteIcon,
@@ -24,6 +25,8 @@ const Header = () => {
   const [isHamOpen, setIsHamOpen] = useState(false);
   const [cafeTransition, setCafeTransition] = useState(false);
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   const parsedData = JSON.parse(localStorage.getItem("userData"));
 
@@ -75,6 +78,17 @@ const Header = () => {
 
   return (
     <header className="relative flex h-20 w-full justify-center lg:justify-end" ref={headerRef}>
+      {/* Hamburger Menu Button */}
+      <button 
+            className="lg:hidden p-2"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? (
+              <MultiplicationSignIcon className="w-6 h-6" />
+            ) : (
+              <Menu01Icon className="w-6 h-6" />
+            )}
+          </button>
       {/* Cafe transition overlay */}
       <div
         className={`fixed inset-0 z-50 bg-blue-600 transition-all duration-700 flex items-center justify-center ${
@@ -103,7 +117,7 @@ const Header = () => {
           </Link>
 
           {/* Main Categories Navigation */}
-          <nav className="static">
+          <nav className="hidden lg:block">
             <ul className="flex items-center gap-8">
               {categoriesData.map((category, index) => (
                 <li
@@ -170,9 +184,9 @@ const Header = () => {
           </nav>
         </div>
         {/* Right side elements */}
-        <div className="flex items-center gap-6">
-          {/* Search Bar */}
-          <div className="flex items-center bg-gray-50 rounded-lg px-4 py-2">
+        <div className="flex items-center gap-4 md:gap-6">
+          {/* Search Bar - Hidden on mobile */}
+          <div className="hidden md:flex items-center bg-gray-50 rounded-lg px-4 py-2">
             <input
               type="text"
               placeholder="Search products..."
@@ -180,6 +194,11 @@ const Header = () => {
             />
             <Search01Icon className="w-5 h-5 text-gray-500 cursor-pointer hover:text-blue transition-colors" />
           </div>
+
+          {/* Mobile Search Icon */}
+          <button className="md:hidden">
+            <Search01Icon className="w-6 h-6" />
+          </button>
 
           {/* Sign In Button */}
           <button className="flex items-center gap-2 hover:text-blue transition-colors">
@@ -201,6 +220,59 @@ const Header = () => {
             </span>
           </button>
         </div>
+        {/* Mobile Menu Overlay */}
+      <div className={`
+        fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300
+        ${isMobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}
+        lg:hidden
+      `} onClick={() => setIsMobileMenuOpen(false)} />
+
+      {/* Mobile Menu Panel */}
+      <div className={`
+        fixed right-0 top-0 h-full w-[80%] max-w-sm bg-white z-50 transform transition-transform duration-300
+        ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}
+        lg:hidden overflow-y-auto
+      `}>
+        <div className="p-4">
+          {/* Mobile Categories */}
+          <div className="space-y-2">
+            {categoriesData.map((category, index) => (
+              <div key={index} className="border-b">
+                <button
+                  className="flex items-center justify-between w-full py-3"
+                  onClick={() => setExpandedCategory(expandedCategory === category ? null : category)}
+                >
+                  <span className="text-sm font-medium">{category.title}</span>
+                </button>
+                
+                {expandedCategory === category && (
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50">
+                    {category.items.map((item, idx) => (
+                      <Link
+                        key={idx}
+                        to={typeof item === 'string' ? `/category/${item.toLowerCase().replace(/\s+/g, '-')}` : item.link}
+                        className="flex flex-col items-center gap-2"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <div className="w-16 h-16">
+                          <img
+                            src={`/images/categories/${(typeof item === 'string' ? item : item.category).toLowerCase().replace(/\s+/g, '-')}.png`}
+                            alt={typeof item === 'string' ? item : item.category}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <span className="text-xs text-center">
+                          {typeof item === 'string' ? item : item.category}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       </div>
     </header>
   );

@@ -28,10 +28,6 @@ const Home = () => {
             title="Gift Options"
             data={productsData.giftOptionCards}
           />
-          <ProductsShowcase
-            title="Wishlist"
-            data={productsData.wishListCards}
-          />
         </div>
       </div>
 

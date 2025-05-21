@@ -38,9 +38,9 @@ const Header = () => {
       </div>
 
       <div className="flex items-center gap-6">
-        <button 
+      <button 
           onClick={handleConvenienceClick}
-          className="hidden md:flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg transition-colors text-sm md:text-base"
         >
           <ShoppingBag className="w-4 h-4" />
           <span>Convenience</span>

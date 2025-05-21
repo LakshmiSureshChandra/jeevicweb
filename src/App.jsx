@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
   useLocation,
 } from "react-router-dom";
 import Header from "./layout/header/index";
@@ -19,6 +18,7 @@ import OrderConfirmation from "./pages/checkout/OrderConfirmation";
 import SignIn from "./pages/signin/SignIn";
 import ProfileSettings from "./pages/settings/ProfileSettings";
 import CreateGift from './pages/CreateGift';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const AppContent = () => {
   const location = useLocation();
@@ -29,17 +29,35 @@ const AppContent = () => {
     <>
       {!isCafePage && !isSignInPage && <Header />}
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/products/:category/:subCategory?" element={<Filters />} />
         <Route path="/product-page" element={<ProductPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/cafe" element={<CafePart />} />
-
-        <Route path="/checkout" element={<ViewCart />} />
-        <Route path="/checkout/confirmation" element={<OrderConfirmation />} />
         <Route path="/sign-in" element={<SignIn />} />
-        <Route path="/profile" element={<ProfileSettings />} />
-        <Route path="/create-gift" element={<CreateGift />} />
+
+        {/* Protected routes */}
+        <Route path="/checkout" element={
+          <ProtectedRoute>
+            <ViewCart />
+          </ProtectedRoute>
+        } />
+        <Route path="/checkout/confirmation" element={
+          <ProtectedRoute>
+            <OrderConfirmation />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <ProfileSettings />
+          </ProtectedRoute>
+        } />
+        <Route path="/create-gift" element={
+          <ProtectedRoute>
+            <CreateGift />
+          </ProtectedRoute>
+        } />
       </Routes>
       {!isCafePage && !isSignInPage && <Footer />}
     </>

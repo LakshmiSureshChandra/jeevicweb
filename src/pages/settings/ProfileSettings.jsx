@@ -5,6 +5,7 @@ import MyOrders from "./MyOrders";
 import ShippingAddress from "./ShippingAddress";
 import JeevicPoints from "./JeevicPoints";
 import ContactUs from "../about/ContactUs"; // Import the ContactUs component
+import { useNavigate } from "react-router-dom";
 
 const componentMap = {
   "Profile": Profile,
@@ -16,12 +17,15 @@ const componentMap = {
 
 const ProfileSettings = () => {
   const [activeTab, setActiveTab] = useState("Profile");
-
+  const navigate = useNavigate();
   const ActiveComponent = componentMap[activeTab];
 
   const handleLogout = () => {
-    // Add logout logic here
-    console.log("Logging out...");
+    // Remove access_token (or jwtToken) from localStorage
+    localStorage.removeItem("access_token");
+
+    // Redirect to sign-in page
+    navigate("/sign-in");
   };
 
   // Filter out any items that don't have a corresponding component

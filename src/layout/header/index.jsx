@@ -89,9 +89,16 @@ const Header = () => {
   };
 
   useEffect(() => {
-    // Check if user is logged in (you might want to use a more robust method)
-    const token = localStorage.getItem("jwtToken");
-    setIsLoggedIn(!!token);
+    const checkToken = () => {
+      const token = localStorage.getItem("access_token");
+      setIsLoggedIn(!!token);
+    };
+  
+    checkToken(); // Check on mount
+  
+    window.addEventListener("storage", checkToken); // React to changes
+  
+    return () => window.removeEventListener("storage", checkToken);
   }, []);
 
   return (

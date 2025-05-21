@@ -1,34 +1,94 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-// Import necessary components and functions
+import { loginRequest, verifyAccountAccess, fetchUserProfile, updateUserProfile } from '../../lib/api';
 
 const SignIn = () => {
-  const [signInMethod, setSignInMethod] = useState('email');
-  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [signInMethod, setSignInMethod] = useState('phone');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [showProfileForm, setShowProfileForm] = useState(false);
 
-  const handleVerifyOtp = () => {
-    // Simulate JWT token verification
-    const fakeJwtToken = 'fake_jwt_token';
-    localStorage.setItem('jwtToken', fakeJwtToken);
+  useEffect(() => {
+    let interval;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
-    // Check the origin of the sign-in request
-    const from = location.state?.from || '/';
-    
-    // Navigate to the appropriate page
-    navigate(from === '/cafe' ? '/cafe' : '/', { replace: true });
+  const handleSendOtp = async () => {
+
+    setLoading(true);
+    try {
+      if (signInMethod === 'phone') {
+        await loginRequest('+91', phoneNumber);
+      } else {
+        await loginRequest(null, null, email);
+      }
+      setOtpSent(true);
+      setResendTimer(30);
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      // Handle error (e.g., show error message to user)
+    }
+    setLoading(false);
   };
 
-  const handleGoogleSignIn = () => {
-    // Implement Google Sign-In logic
-    console.log('Google Sign-In');
+  const handleVerifyOtp = async () => {
+    setLoading(true);
+    try {
+      const response = await verifyAccountAccess(
+        signInMethod === 'phone' ? '+91' : null,
+        signInMethod === 'phone' ? phoneNumber : null,
+        otp// Include the user-entered OTP
+      );
+      if (response.access_token) {
+        localStorage.setItem('access_token', response.access_token);
+        await checkAndUpdateUserProfile();
+      }
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      // Handle error (e.g., show error message to user)
+    }
+    setLoading(false);
   };
 
-  const handleSendOtp = () => {
-    // Implement OTP sending logic
-    console.log('Send OTP to', emailOrPhone);
+  const checkAndUpdateUserProfile = async () => {
+    try {
+      const userProfile = await fetchUserProfile();
+      if (!userProfile.first_name || !userProfile.last_name || !userProfile.email) {
+        setShowProfileForm(true);
+      } else {
+        navigate('/', { replace: true });
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      // Handle error
+    }
+  };
+
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await updateUserProfile(firstName, lastName, email, profilePicture);
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      // Handle error
+    }
+    setLoading(false);
   };
 
   return (
@@ -39,64 +99,109 @@ const SignIn = () => {
         </div>
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Sign In</h2>
 
-        <button
-          onClick={handleGoogleSignIn}
-          className="w-full bg-white border border-gray-300 text-gray-700 py-2 rounded-md mb-4 hover:bg-gray-50 transition-colors flex items-center justify-center"
-        >
-          <img src="/google-icon.png" alt="Google" className="h-5 mr-2" />
-          Sign in with Google
-        </button>
-
-        <div className="flex items-center my-4">
-          <hr className="flex-grow border-gray-300" />
-          <span className="px-3 text-gray-500 text-sm">or</span>
-          <hr className="flex-grow border-gray-300" />
-        </div>
-
         <div className="flex mb-4">
           <button
-            onClick={() => setSignInMethod('email')}
-            className={`w-1/2 py-2 text-sm font-medium rounded-l-md ${signInMethod === 'email' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}
-          >
-            Email
-          </button>
-          <button
             onClick={() => setSignInMethod('phone')}
-            className={`w-1/2 py-2 text-sm font-medium rounded-r-md ${signInMethod === 'phone' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+            className={`w-1/2 py-2 text-sm font-medium rounded-l-md ${signInMethod === 'phone' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}
           >
             Phone
           </button>
+          <button
+            onClick={() => setSignInMethod('email')}
+            className={`w-1/2 py-2 text-sm font-medium rounded-r-md ${signInMethod === 'email' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`}
+          >
+            Email
+          </button>
         </div>
 
-        <input
-          type={signInMethod === 'email' ? 'email' : 'tel'}
-          placeholder={signInMethod === 'email' ? 'Enter your email' : 'Enter your phone number'}
-          value={emailOrPhone}
-          onChange={(e) => setEmailOrPhone(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {signInMethod === 'phone' ? (
+          <div className="mb-4">
+            <input
+              type="tel"
+              placeholder="Enter your phone number"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        ) : (
+          <input
+            type="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        )}
 
         <button
           onClick={handleSendOtp}
-          className="w-full bg-blue-500 text-white py-2 rounded-md mb-4 hover:bg-blue-600 transition-colors"
+          disabled={loading || resendTimer > 0}
+          className={`w-full bg-blue-500 text-white py-2 rounded-md mb-4 hover:bg-blue-600 transition-colors ${(loading || resendTimer > 0) && 'opacity-50 cursor-not-allowed'}`}
         >
-          Send OTP
+          {loading ? 'Sending...' : resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Send OTP'}
         </button>
 
-        <input
-          type="text"
-          placeholder="Enter OTP"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        {otpSent && (
+          <>
+            <input
+              type="number"
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
 
-        <button
-          onClick={handleVerifyOtp}
-          className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors"
-        >
-          Verify OTP
-        </button>
+            <button
+              onClick={handleVerifyOtp}
+              disabled={loading}
+              className={`w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors ${loading && 'opacity-50 cursor-not-allowed'}`}
+            >
+              {loading ? 'Verifying...' : 'Verify OTP'}
+            </button>
+          </>
+        )}
+        {showProfileForm && (
+          <form onSubmit={handleProfileSubmit} className="mt-4">
+            <input
+              type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setProfilePicture(e.target.files[0])}
+              className="w-full mb-2"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors ${loading && 'opacity-50 cursor-not-allowed'}`}
+            >
+              {loading ? 'Updating...' : 'Update Profile'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

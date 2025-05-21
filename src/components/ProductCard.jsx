@@ -10,6 +10,7 @@ const ProductCard = ({
   discountedPrice,
   originalPrice,
   discount,
+  onAddToGift,
 }) => {
   const navigate = useNavigate();
   const [isInCart, setIsInCart] = useState(false);
@@ -76,6 +77,18 @@ const ProductCard = ({
           <p className="text-xs md:text-sm text-gray-600 line-clamp-2">{description}</p>
         </div>
       </div>
+      
+      {onAddToGift && (
+        <button
+          className="mt-2 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToGift();
+          }}
+        >
+          Add to Gift
+        </button>
+      )}
     </div>
   );
 };

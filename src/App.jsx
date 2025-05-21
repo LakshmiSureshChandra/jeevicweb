@@ -18,6 +18,7 @@ import CafePart from "./components/CafePart";
 import OrderConfirmation from "./pages/checkout/OrderConfirmation";
 import SignIn from "./pages/signin/SignIn";
 import ProfileSettings from "./pages/settings/ProfileSettings";
+import CreateGift from './pages/CreateGift';
 
 const AppContent = () => {
   const location = useLocation();
@@ -38,6 +39,7 @@ const AppContent = () => {
         <Route path="/checkout/confirmation" element={<OrderConfirmation />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/profile" element={<ProfileSettings />} />
+        <Route path="/create-gift" element={<CreateGift />} />
       </Routes>
       {!isCafePage && !isSignInPage && <Footer />}
     </>

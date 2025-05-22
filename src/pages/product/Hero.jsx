@@ -17,8 +17,21 @@ const Hero = ({ productData }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-  const images = productData.image_url || [];
-
+  const {
+    id,
+    name,
+    description,
+    meta_data,
+    image_url: images = [],
+    price,
+    availability_count
+  } = productData.product;
+  // Parse meta_data
+  const colors = JSON.parse(meta_data?.colors || '[]');
+  const variants = JSON.parse(meta_data?.variants || '[]');
+  const slashedPrice = meta_data?.slashed_price;
+  const discount = meta_data?.discount;
+  console.log(productData);
   const handleImageClick = (index) => {
     setCurrentImageIndex(index);
   };
@@ -167,77 +180,73 @@ const Hero = ({ productData }) => {
         </div>
       </div>
 
+      {/* Product details section */}
       <div className="flex w-full flex-col gap-8">
         <div className="flex w-full justify-between">
           <div className="text-dark flex flex-col gap-2">
             <h2 className="text-xl font-bold uppercase lg:text-[22px]">
-              {productData.name}
+              {name}
             </h2>
-            {productData?.meta_data?.variants && (() => {
-  try {
-    const variants = JSON.parse(productData.meta_data.variants);
-    return variants.map((variant, index) => (
-      <span key={index} className="px-2 py-1 border rounded mr-2">
-        {variant}
-      </span>
-    ));
-  } catch (err) {
-    console.error("Invalid variants JSON:", err);
-    return null;
-  }
-})()}
-
-
-{productData?.meta_data?.discount && (
-  <span className="text-xs font-semibold text-blue-800 ml-2">
-    -{productData.meta_data.discount}%
-  </span>
-)}
-
-
-
+            <p className="text-gray-600">{description}</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-blue-600">₹{price}</span>
+              {slashedPrice && (
+                <span className="text-lg text-gray-500 line-through">₹{slashedPrice}</span>
+              )}
+              {discount && (
+                <span className="text-sm font-semibold text-green-600">
+                  ({discount}% off)
+                </span>
+              )}
+            </div>
           </div>
-          <FavouriteButton liked={isFavorite} setLiked={handleFavoriteToggle} />
+          <FavouriteButton liked={isFavorite} setLiked={setIsFavorite} />
         </div>
 
-        <div className="flex flex-col gap-5">
-          <div className="flex items-baseline gap-6">
-            <h3 className="text-dark">Size</h3>
-            <div className="flex flex-wrap gap-2">
-              {JSON.parse(productData.meta_data.variants).map((size) => (
-                <button
-                  key={size}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    selectedSize === size ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <h3 className="text-dark">Color</h3>
-            <div className="flex flex-wrap gap-2">
-              {JSON.parse(productData.meta_data.colors).map((colorObj) => {
-                const colorName = Object.keys(colorObj)[0];
-                const colorCode = colorObj[colorName];
-                return (
+         {/* Size and Color selection */}
+         <div className="flex flex-col gap-5">
+          {variants.length > 0 && (
+            <div className="flex items-baseline gap-6">
+              <h3 className="text-dark">Size</h3>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((variant) => (
                   <button
-                    key={colorName}
-                    className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                      selectedColor === colorCode ? 'scale-110 border-gray-800' : 'border-transparent'
+                    key={variant}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedSize === variant ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
-                    style={{ backgroundColor: colorCode }}
-                    onClick={() => setSelectedColor(colorCode)}
-                  />
-                );
-              })}
+                    onClick={() => setSelectedSize(variant)}
+                  >
+                    {variant}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
+          {colors.length > 0 && (
+            <div className="flex items-center gap-6">
+              <h3 className="text-dark">Color</h3>
+              <div className="flex flex-wrap gap-2">
+                {colors.map((colorObj) => {
+                  const colorName = Object.keys(colorObj)[0];
+                  const colorCode = colorObj[colorName];
+                  return (
+                    <button
+                      key={colorName}
+                      className={`w-8 h-8 rounded-full border-2 transition-transform ${
+                        selectedColor === colorCode ? 'scale-110 border-gray-800' : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: colorCode }}
+                      onClick={() => setSelectedColor(colorCode)}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Quantity selector */}
           <div className="flex items-center gap-6">
             <h3 className="text-dark">Quantity</h3>
             <div className="flex items-center gap-4 rounded border border-[#C4C4C4] bg-transparent px-4 py-2 text-[#C4C4C4]">
@@ -261,26 +270,32 @@ const Hero = ({ productData }) => {
           </div>
         </div>
 
+        {/* Add to Cart and Buy Now buttons */}
         <div className="mt-8 flex flex-col gap-4 md:gap-5">
           <div className="flex flex-col gap-4 sm:flex-row md:gap-5">
-            <Link
-              to="/checkout"
+            <button
               className="flex w-full cursor-pointer items-center justify-center rounded bg-blue-500 py-3 text-white uppercase transition-colors hover:bg-blue-600 md:py-4"
-            >
-              Buy now
-            </Link>
-            <button 
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-[#434343] bg-transparent py-3 transition-colors hover:bg-gray-100 md:py-4"
               onClick={handleAddToCart}
               disabled={addToCartMutation.isPending}
             >
-              <ShoppingBagAddIcon />
-              <span>Add to cart</span>
+              {addToCartMutation.isPending ? 'Adding...' : 'Add to Cart'}
             </button>
+            <Link
+              to="/checkout"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-[#434343] bg-transparent py-3 transition-colors hover:bg-gray-100 md:py-4"
+            >
+              <ShoppingBagAddIcon />
+              <span>Buy Now</span>
+            </Link>
           </div>
+        </div>
+
+        <div className="text-sm text-gray-600">
+          Available: {availability_count} in stock
         </div>
       </div>
 
+      {/* 360 View modal */}
       {show360View && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="relative h-[80vh] w-[80vw] rounded-lg bg-white p-4">

@@ -1,48 +1,20 @@
-import {
-  ArrowLeft01Icon,
-  ArrowRight01Icon,
-  ThumbsDownIcon,
-  ThumbsUpIcon,
-} from "hugeicons-react";
 import React from "react";
 import StarRating from "../../components/ui/StarRating";
-
 import { ProductPageSlider, ProductPageSlide } from "./ProductPageSlider";
 
-const reviewsData = [
-  {
-    stars: 5,
-    shortReview: "Its really amazing",
-    author: "Sara machnail",
-    advantages: "Color, Size",
-    disadvantages: "none",
-    longReview:
-      "What sets 5 Star Cloth apart from other brands is their ability to create timeless pieces that never go out of style. Their designs are sophisticated and elegant, catering to individuals who appreciate refined fashion. Whether it's a formal event or a casual outing, their clothing effortlessly elevates any ensemble.",
-    images: ["/images/review-img-1.png", "/images/review-img-2.png"],
-    likes: 2,
-    dislikes: 1,
-  },
-  {
-    stars: 5,
-    shortReview: "Its really amazing",
-    author: "Sara machnail",
-    advantages: "Color, Size",
-    disadvantages: "none",
-    longReview:
-      "What sets 5 Star Cloth apart from other brands is their ability to create timeless pieces that never go out of style. Their designs are sophisticated and elegant, catering to individuals who appreciate refined fashion. Whether it's a formal event or a casual outing, their clothing effortlessly elevates any ensemble.",
-    images: ["/images/review-img-1.png", "/images/review-img-2.png"],
-    likes: 2,
-    dislikes: 1,
-  },
-];
-
-const ReviewSlider = () => {
+const ReviewSlider = ({ reviews }) => {
   return (
-    <section className="my-12 flex flex-col gap-12 border-b border-b-[#d9d9d9]">
-      <ProductPageSlider gap="8rem" perPage={1} title="ALL REVIEWS">
-        {reviewsData.map((reviewData, i) => (
+    <section className="my-12 bg-white rounded-lg shadow-md overflow-hidden">
+      <h2 className="text-2xl font-bold text-gray-800 p-6 border-b border-gray-200">Customer Feedback</h2>
+      <ProductPageSlider gap="2rem" perPage={1} title="">
+        {reviews.map((review, i) => (
           <ProductPageSlide key={i}>
-            <ReviewSlide {...reviewData} />
+            <ReviewSlide
+              stars={review.rating}
+              shortReview={review.comment}
+              author={review.user_name || "Anonymous"}
+              created_at={review.created_at}
+            />
           </ProductPageSlide>
         ))}
       </ProductPageSlider>
@@ -50,47 +22,19 @@ const ReviewSlider = () => {
   );
 };
 
-export default ReviewSlider;
-
-const ReviewSlide = ({
-  stars,
-  shortReview,
-  author,
-  advantages,
-  disadvantages,
-  longReview,
-  images,
-  likes,
-  dislikes,
-}) => {
+const ReviewSlide = ({ stars, shortReview, author, created_at }) => {
   return (
-    <div>
-      <div className="flex flex-col gap-4 md:flex-row">
+    <div className="flex flex-col gap-6 p-6">
+      <div className="flex items-center gap-4">
         <StarRating stars={stars} />
-        <div className="flex w-full flex-col gap-8">
-          <div className="flex w-full justify-between">
-            <div>
-              <h3 className="text-dark font-bold">{shortReview}</h3>
-              <p className="text-sm text-[#9d9d9d]">By {author}</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <h4 className="text-sm text-[#9D9D9D] sm:min-w-[150px] md:text-base">
-                Review
-              </h4>
-              <p className="text-dark text-sm md:text-base">{longReview}</p>
-            </div>
-          </div>
-        </div>
+        <p className="text-lg font-semibold text-gray-700">{stars}/5</p>
       </div>
-
-      <div className="mt-4 flex gap-3">
-        {images?.map((image, i) => {
-          return <img src={image} key={i} alt="product image" />;
-        })}
-      </div>
+      <h3 className="text-xl font-bold text-gray-800">{shortReview}</h3>
+      <p className="text-sm text-gray-600">
+        By <span className="font-medium">{author}</span> on {new Date(created_at).toLocaleDateString()}
+      </p>
     </div>
   );
 };
+
+export default ReviewSlider;

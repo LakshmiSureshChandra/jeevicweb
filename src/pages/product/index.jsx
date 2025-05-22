@@ -12,7 +12,6 @@ const ProductPage = () => {
   const [productData, setProductData] = useState(location.state || null); // Use state from location
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(null);
-console.log(productData)
   useEffect(() => {
     if (!productData) {
       console.error("Product data not available in state.");
@@ -35,16 +34,14 @@ console.log(productData)
   }, [product_id, productData]);
 
   return (
-    <main className="flex w-full justify-center">
-      {productData ? (
-        <>
+    <main className="container mx-auto px-4 py-8">
+      {productData && (
+        <div className="flex flex-col gap-8">
           <Hero productData={productData} />
           <Reviews reviews={reviews} averageRating={averageRating} />
           <ReviewSlider reviews={reviews} />
           <YouMightLike />
-        </>
-      ) : (
-        <div>Loading...</div>
+        </div>
       )}
     </main>
   );

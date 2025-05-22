@@ -44,11 +44,11 @@ const Home = () => {
           <section className="w-full py-12 bg-gray-50">
             <div className="flex flex-col gap-8">
 
-              <div className="flex flex-col lg:flex-row gap-6 px-4">
+              <div className="flex flex-col lg:flex-row items-center gap-6 px-4">
                 {/* Featured Banner */}
-                <div className="lg:hidden w-full">
+                <div className="w-full lg:w-1/3 h-full">
                   <div className="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
-                  <div className="aspect-[16/9] lg:aspect-[4/5] overflow-hidden">
+                    <div className="aspect-[16/9] lg:aspect-square overflow-hidden">
                       <video
                         src="/flash-sale.mp4"
                         autoPlay
@@ -58,38 +58,15 @@ const Home = () => {
                         className="w-full h-full object-cover opacity-100"
                       />
                     </div>
-                    <div className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center">
-                      <h3 className="text-white font-bold text-2xl mb-1">Flash Sale</h3>
-                      <p className="text-white/90 text-sm mb-4">Discover amazing deals with up to 50% off</p>
-                      <Link
-                        to="/products/flash-sales"
-                        className="bg-white text-black px-6 py-2 rounded-full text-sm font-medium hover:bg-black hover:text-white transition-colors duration-300"
-                      >
-                        View All
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="hidden lg:block w-[600px] flex-shrink-0">
-                  <div className="group relative h-[97%] overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
-                  <div className="aspect-[4/5] overflow-hidden">
-                      <video
-                        src="/flash-sale.mp4"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover opacity-100"
-                      />
-                    </div>
-                    <div className="absolute inset-0 flex flex-col justify-end p-8 bg-gradient-to-t from-black/60 to-transparent">
+                    <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8 bg-gradient-to-t from-black/60 to-transparent">
                       <div className="text-left">
-                        <h3 className="text-white font-bold text-5xl mb-3">Flash Sale</h3>
-                        <p className="text-white/90 text-lg mb-6 max-w-[80%]">Discover amazing deals with up to 50% off</p>
+                        <h3 className="text-white font-bold text-3xl sm:text-4xl md:text-5xl mb-2 sm:mb-3">Flash Sale</h3>
+                        <p className="text-white/90 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 max-w-[90%] sm:max-w-[80%]">
+                          Discover amazing deals with up to 50% off
+                        </p>
                         <Link
                           to="/products/flash-sales"
-                          className="inline-flex items-center bg-white text-black px-8 py-3 rounded-full text-base font-medium hover:bg-black hover:text-white transition-colors duration-300"
+                          className="inline-flex items-center bg-white text-black px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full text-sm sm:text-base font-medium hover:bg-black hover:text-white transition-colors duration-300"
                         >
                           View All
                         </Link>
@@ -99,45 +76,32 @@ const Home = () => {
                 </div>
 
                 {/* Grid of Products */}
-                <div className="w-full lg:flex-1">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4">
-                    {/* First Row */}
-                    <div className="contents">
-                      {productsData.flashSaleCards.slice(1, window.innerWidth < 768 ? 4 : 6).map((product, index) => (
-                        <div key={index} className="w-full">
-                          <ProductCard product={product} />
-                        </div>
-                      ))}
-                    </div>
-                    {/* Second Row */}
-                    <div className="contents">
-                      {productsData.flashSaleCards.slice(window.innerWidth < 768 ? 4 : 6, window.innerWidth < 768 ? 7 : 11).map((product, index) => (
-                        <div key={index + (window.innerWidth < 768 ? 4 : 6)} className="w-full">
-                          <ProductCard product={product} />
-                        </div>
-                      ))}
-                    </div>
+                <div className="w-full lg:w-2/3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
+                    {productsData.flashSaleCards.slice(0, 6).map((product, index) => (
+                      <div key={index} className="w-full">
+                        <ProductCard product={product} />
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             </div>
           </section>
+
           <DiscoverNewItems />
-          <section className="w-full py-2">
+          <section className="w-full py-1 bg-gray-50">
             <div className="flex flex-col gap-8">
-              <div className="flex items-center justify-between px-4">
-                <h2 className="text-2xl font-semibold">Just For You</h2>
-                <Link
-                  to="/products/just-for-you"
-                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-black transition-colors"
-                >
-                  View all
-                  <ArrowRight01Icon className="w-4 h-4" />
-                </Link>
+              <div className="flex flex-col items-center justify-between gap-2 sm:flex-row md:items-baseline">
+                <div className="flex items-baseline">
+                  <h2 className="text-2xl font-medium md:text-3xl">
+                    Just For You
+                  </h2>
+                </div>
               </div>
 
               <div className="relative">
-                <div className="flex overflow-x-auto gap-6 px-4 pb-4 hide-scrollbar snap-x snap-mandatory">
+                <div className="flex overflow-x-auto gap-6 pb-4 hide-scrollbar snap-x snap-mandatory">
                   {productsData.justForYouCards.map((product, index) => (
                     <div
                       key={index}

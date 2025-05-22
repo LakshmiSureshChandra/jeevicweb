@@ -33,7 +33,7 @@ const AppContent = () => {
         {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/products/:category/:subCategory?" element={<Filters />} />
-        <Route path="/product-page" element={<ProductPage />} />
+        <Route path="/product-page/:product_id" element={<ProductPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/cafe" element={<CafePart />} />

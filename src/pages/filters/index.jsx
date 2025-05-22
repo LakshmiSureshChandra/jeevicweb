@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Select } from "radix-ui";
 import { Accordion } from "radix-ui";
@@ -10,22 +10,60 @@ import {
 import DualRangeSlider from "../../components/ui/DualRangeSlider";
 import SelectItem from "../../components/ui/SelectItem";
 import ProductCard from "../../components/ProductCard";
-import productsData from "../../data/productsData.json";
+import { getProductsBySubCategory, getAllSubCategories, getSubcategoriesById } from "../../lib/api"; // Import API functions
 
 const Filters = () => {
   const [showFilter, setShowFilter] = useState(false);
   const { category, subCategory } = useParams();
-  const displayedCategory = subCategory
-    ? subCategory.replace(/-/g, " ")
-    : category.replace(/-/g, " ");
+  const [products, setProducts] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [subCategoryName, setSubCategoryName] = useState("");
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const subCategoryId = subCategory; // Assuming subCategory is the ID
+        const productsData = await getProductsBySubCategory(subCategoryId);
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+
+    const fetchSubCategoryName = async () => {
+      try {
+        const subCategoryData = await getSubcategoriesById(subCategory);
+        setSubCategoryName(subCategoryData.name);
+      } catch (error) {
+        console.error("Failed to fetch subcategory name:", error);
+      }
+    };
+
+    const fetchSubCategories = async () => {
+      try {
+        const subCategoriesData = await getAllSubCategories();
+        setSubCategories(subCategoriesData);
+      } catch (error) {
+        console.error("Failed to fetch subcategories:", error);
+      }
+    };
+
+    fetchProducts();
+    fetchSubCategoryName();
+    fetchSubCategories();
+  }, [subCategory]);
 
   return (
     <>
-      <Banner setShowFilter={setShowFilter} subCategory={displayedCategory} />
+      <Banner
+        setShowFilter={setShowFilter}
+        subCategory={subCategoryName} // Pass subcategory name
+        totalProducts={products.length} // Pass total products count
+      />
       <div className="flex w-full justify-center">
         <div className="flex flex-col md:flex-row w-full md:w-[95%] lg:w-[90%] gap-4 md:gap-6 lg:gap-8 py-4 md:py-6 lg:py-8 px-4 md:px-0">
           <AllFilters showFilter={showFilter} setShowFilter={setShowFilter} />
-          <FilterProducts />
+          <FilterProducts products={products} />
         </div>
       </div>
     </>
@@ -33,7 +71,7 @@ const Filters = () => {
 };
 
 // Banner component
-const Banner = ({ subCategory, setShowFilter }) => {
+const Banner = ({ subCategory, setShowFilter, totalProducts }) => {
   return (
     <div className="flex w-full justify-center md:bg-[#E9E9E9]">
       <div className="flex w-[90%] max-w-[1440px] flex-col justify-between gap-4 py-6 md:flex-row">
@@ -41,7 +79,7 @@ const Banner = ({ subCategory, setShowFilter }) => {
           <h2 className="text-dark text-xl font-semibold capitalize">
             {subCategory}
           </h2>
-          <span className="text-[#555]">110 items</span>
+          <span className="text-[#555]">{totalProducts} items</span> {/* Display total products */}
         </div>
         <div className="flex rounded-[4px] border border-[#e9e9e9]">
           <SortBy />
@@ -180,12 +218,12 @@ const AllFilters = ({ showFilter, setShowFilter }) => {
 };
 
 // FilterProducts component
-const FilterProducts = () => {
+const FilterProducts = ({ products }) => {
   return (
     <div className="flex-1 w-full">
       <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
-        {productsData.flashSaleCards.map((cardData, i) => (
-          <ProductCard key={i} {...cardData} />
+        {products.map((product, i) => (
+          <ProductCard key={i} {...product} />
         ))}
       </div>
     </div>

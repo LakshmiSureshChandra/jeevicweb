@@ -26,7 +26,7 @@ const Header = () => {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [cartItems, setCartItems] = useState(cardData);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  console.log(categoriesData)
   const parsedData = JSON.parse(localStorage.getItem("userData"));
 
   const headerRef = useRef(null);
@@ -171,7 +171,7 @@ const Header = () => {
                             >
                               <div className="aspect-square overflow-hidden w-20 h-20 flex items-center justify-center">
                                 <img
-                                  src={`/images/categories/${(typeof item === 'string' ? item : item.category).toLowerCase().replace(/\s+/g, '-')}.png`}
+                                  src={item.image}
                                   alt={typeof item === 'string' ? item : item.category}
                                   className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
                                 />

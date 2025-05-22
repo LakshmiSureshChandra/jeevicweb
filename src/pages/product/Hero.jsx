@@ -9,28 +9,15 @@ import { Link } from "react-router-dom";
 import { useAddToCart } from "../../services/mutations/CartMutations";
 import { addToWishlist, removeFromWishlist } from "../../lib/api";
 
-const sizes = ["XS", "S", "M", "L", "XL"];
-const colors = ["#750430", "#00A95D", "#A2D2FC", "#FF7A00"];
-
-const Hero = () => {
+const Hero = ({ productData }) => {
   const [quantity, setQuantity] = useState(1);
   const [show360View, setShow360View] = useState(false);
-  const [selectedSize, setSelectedSize] = useState(sizes[0]);
-  const [selectedColor, setSelectedColor] = useState(colors[0]);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-
-  const images = [
-    "/images/product-page-main.jpg",
-    "/images/product-page-1.jpg",
-    "/images/product-page-2.jpg",
-    "/images/product-page-3.jpg",
-    "/images/product-page-4.jpg",
-    "/images/product-page-5.jpg",
-    "/images/product-page-6.jpg",
-    "/images/product-page-7.jpg",
-  ];
+  const images = productData.image_url || [];
 
   const handleImageClick = (index) => {
     setCurrentImageIndex(index);
@@ -98,7 +85,7 @@ const Hero = () => {
   const handleAddToCart = async () => {
     try {
       await addToCartMutation.mutateAsync({
-        product_id: "1", // Replace with actual product ID
+        product_id: productData.id,
         quantity: quantity,
         size: selectedSize,
         color: selectedColor,
@@ -111,9 +98,9 @@ const Hero = () => {
   const handleFavoriteToggle = async () => {
     try {
       if (isFavorite) {
-        await removeFromWishlist("1"); // Replace with actual product ID
+        await removeFromWishlist(productData.id);
       } else {
-        await addToWishlist("1"); // Replace with actual product ID
+        await addToWishlist(productData.id);
       }
       setIsFavorite(!isFavorite);
     } catch (error) {
@@ -127,7 +114,7 @@ const Hero = () => {
         <div 
           ref={sideImagesRef} 
           className="hidden md:flex md:w-[15%] md:flex-col md:gap-2 md:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
-          style={{ height: '400px' }} // Fixed height of 500px
+          style={{ height: '400px' }}
         >
           {images.map((img, index) => (
             <img
@@ -156,7 +143,7 @@ const Hero = () => {
               onClick={handlePrevImage}
               className="bg-white/50 p-2 rounded-r-full"
             >
-              &#10094; {/* Left chevron */}
+              &#10094;
             </button>
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center md:hidden">
@@ -164,7 +151,7 @@ const Hero = () => {
               onClick={handleNextImage}
               className="bg-white/50 p-2 rounded-l-full"
             >
-              &#10095; {/* Right chevron */}
+              &#10095;
             </button>
           </div>
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 md:hidden">
@@ -184,9 +171,31 @@ const Hero = () => {
         <div className="flex w-full justify-between">
           <div className="text-dark flex flex-col gap-2">
             <h2 className="text-xl font-bold uppercase lg:text-[22px]">
-              Short printed dress
+              {productData.name}
             </h2>
-            <p className="text-medium md:text-lg">$39.99</p>
+            {productData?.meta_data?.variants && (() => {
+  try {
+    const variants = JSON.parse(productData.meta_data.variants);
+    return variants.map((variant, index) => (
+      <span key={index} className="px-2 py-1 border rounded mr-2">
+        {variant}
+      </span>
+    ));
+  } catch (err) {
+    console.error("Invalid variants JSON:", err);
+    return null;
+  }
+})()}
+
+
+{productData?.meta_data?.discount && (
+  <span className="text-xs font-semibold text-blue-800 ml-2">
+    -{productData.meta_data.discount}%
+  </span>
+)}
+
+
+
           </div>
           <FavouriteButton liked={isFavorite} setLiked={handleFavoriteToggle} />
         </div>
@@ -195,7 +204,7 @@ const Hero = () => {
           <div className="flex items-baseline gap-6">
             <h3 className="text-dark">Size</h3>
             <div className="flex flex-wrap gap-2">
-              {sizes.map((size) => (
+              {JSON.parse(productData.meta_data.variants).map((size) => (
                 <button
                   key={size}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
@@ -212,16 +221,20 @@ const Hero = () => {
           <div className="flex items-center gap-6">
             <h3 className="text-dark">Color</h3>
             <div className="flex flex-wrap gap-2">
-              {colors.map((color) => (
-                <button
-                  key={color}
-                  className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                    selectedColor === color ? 'scale-110 border-gray-800' : 'border-transparent'
-                  }`}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setSelectedColor(color)}
-                />
-              ))}
+              {JSON.parse(productData.meta_data.colors).map((colorObj) => {
+                const colorName = Object.keys(colorObj)[0];
+                const colorCode = colorObj[colorName];
+                return (
+                  <button
+                    key={colorName}
+                    className={`w-8 h-8 rounded-full border-2 transition-transform ${
+                      selectedColor === colorCode ? 'scale-110 border-gray-800' : 'border-transparent'
+                    }`}
+                    style={{ backgroundColor: colorCode }}
+                    onClick={() => setSelectedColor(colorCode)}
+                  />
+                );
+              })}
             </div>
           </div>
 

@@ -81,11 +81,35 @@ export const getProductById = async (productId) => {
     handleError(error);
   }
 };
+export const getReviewsByProductId = async (productId) => {
+  try {
+    const response = await api.get(`/review/p/${productId}`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+export const getAverageRatingByProductId = async (productId) => {
+  try {
+    const response = await api.get(`/review/avg/p/${productId}`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
 
 // Category APIs
 export const getAllCategories = async () => {
   try {
     const response = await api.get("/category");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+export const getAllSubCategories = async () => {
+  try {
+    const response = await api.get("/subcategory");
     return response.data;
   } catch (error) {
     handleError(error);
@@ -100,13 +124,23 @@ export const getSubcategoriesByCategory = async (categoryId) => {
     handleError(error);
   }
 };
+export const getSubcategoriesById = async (subCategoryId) => {
+  try {
+    const response = await api.get(`/subcategory/${subCategoryId}`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
 
 // Wishlist APIs
 export const addToWishlist = async (productId) => {
   try {
     const response = await api.post("/wishlist", { product_id: productId });
+    console.log("Request sent to /wishlist"); // Log to confirm request is sent
     return response.data;
   } catch (error) {
+    console.error("Failed to add to wishlist:", error); // Log error details
     handleError(error);
   }
 };
@@ -361,6 +395,14 @@ export const verifyEmailOtp = async (otp) => {
 export const getNewItems = async () => {
   try {
     const response = await api.get("/product/newitems");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+export const getJustForYou = async () => {
+  try {
+    const response = await api.get("/product/justforyou");
     return response.data;
   } catch (error) {
     handleError(error);

@@ -1,8 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ChevronDown } from 'lucide-react';
 import {
-  ArrowRight01Icon,
-  FavouriteIcon,
   Menu01Icon,
   MultiplicationSignIcon,
   Search01Icon,
@@ -12,9 +9,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, Popover } from "radix-ui";
 import categoriesData from "../../data/categoriesData";
-import SettingsMenu from "./SettingsMenu";
 import cardData from "../../data/cartData";
-import settingsData from "../../data/settingsData";
 import CartMenu from "./CartMenu";
 
 const Header = () => {
@@ -262,8 +257,6 @@ const Header = () => {
             <UserIcon className="w-5 h-5" />
             <span className="text-sm font-medium">{isLoggedIn ? 'Profile' : 'Sign In'}</span>
           </button>
-
-          {/* Remove the SettingsMenu component and its related code */}
 
           {/* Cafe Toggle */}
           <button 

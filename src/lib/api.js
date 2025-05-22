@@ -3,9 +3,6 @@ import axios from "axios";
 const BASE_URL = "http://localhost:4545";
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 api.interceptors.request.use((config) => {
@@ -247,7 +244,7 @@ export const getProductsByIds = async (productIds) => {
 export const loginRequest = async (countryCode, phoneNumber) => {
   try {
     const response = await api.post("/auth/login-request", {
-      country_code: +countryCode,
+      country_code: countryCode,
       phone_number: phoneNumber,
     });
     return response.data;
@@ -289,12 +286,45 @@ export const fetchUserProfile = async () => {
   }
 };
 
-export const updateUserProfile = async (firstName, lastName) => {
+export const uploadProfilePicture = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.put("/upload", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data.url;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const updateUserProfile = async (formData) => {
   try {
     const access_token = localStorage.getItem("access_token");
+    let profileData = {
+      first_name: formData.get('first_name'),
+      last_name: formData.get('last_name')
+    };
+
+    // If there's a profile picture, upload it first
+    const profilePicture = formData.get('profile_picture');
+    if (profilePicture) {
+      const imageUrl = await uploadProfilePicture(profilePicture);
+      profileData.profile_picture = imageUrl;
+    }
+
+    // Update user profile with all data including image URL if present
     const response = await api.patch("/auth/user", 
-      { first_name: firstName, last_name: lastName },
-      { headers: { Authorization: `Bearer ${access_token}` } }
+      profileData,
+      { 
+        headers: { 
+          Authorization: `Bearer ${access_token}`,
+          'Content-Type': 'application/json'
+        } 
+      }
     );
     return response.data;
   } catch (error) {
@@ -322,6 +352,15 @@ export const verifyEmailOtp = async (otp) => {
       { otp },
       { headers: { Authorization: `Bearer ${access_token}` } }
     );
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getNewItems = async () => {
+  try {
+    const response = await api.get("/product/newitems");
     return response.data;
   } catch (error) {
     handleError(error);

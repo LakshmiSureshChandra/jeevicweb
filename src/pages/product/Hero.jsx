@@ -6,6 +6,8 @@ import {
   ShoppingBagAddIcon,
 } from "hugeicons-react";
 import { Link } from "react-router-dom";
+import { useAddToCart } from "../../services/mutations/CartMutations";
+import { addToWishlist, removeFromWishlist } from "../../lib/api";
 
 const sizes = ["XS", "S", "M", "L", "XL"];
 const colors = ["#750430", "#00A95D", "#A2D2FC", "#FF7A00"];
@@ -91,9 +93,32 @@ const Hero = () => {
     setTouchEnd(null);
   };
 
-  const handleFavoriteToggle = () => {
-    setIsFavorite(!isFavorite);
-    // Here you can add logic to save the favorite status to a backend or local storage
+  const addToCartMutation = useAddToCart();
+
+  const handleAddToCart = async () => {
+    try {
+      await addToCartMutation.mutateAsync({
+        product_id: "1", // Replace with actual product ID
+        quantity: quantity,
+        size: selectedSize,
+        color: selectedColor,
+      });
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    }
+  };
+
+  const handleFavoriteToggle = async () => {
+    try {
+      if (isFavorite) {
+        await removeFromWishlist("1"); // Replace with actual product ID
+      } else {
+        await addToWishlist("1"); // Replace with actual product ID
+      }
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error("Failed to update wishlist:", error);
+    }
   };
 
   return (
@@ -231,7 +256,11 @@ const Hero = () => {
             >
               Buy now
             </Link>
-            <button className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-[#434343] bg-transparent py-3 transition-colors hover:bg-gray-100 md:py-4">
+            <button 
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-[#434343] bg-transparent py-3 transition-colors hover:bg-gray-100 md:py-4"
+              onClick={handleAddToCart}
+              disabled={addToCartMutation.isPending}
+            >
               <ShoppingBagAddIcon />
               <span>Add to cart</span>
             </button>

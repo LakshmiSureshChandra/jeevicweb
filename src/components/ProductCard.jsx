@@ -2,8 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FavouriteButton from "./ui/FavouriteButton";
 import { ShoppingBag03Icon } from "hugeicons-react";
+import { useAddToCart } from "../services/mutations/CartMutations";
+import { addToWishlist, removeFromWishlist } from "../lib/api";
 
 const ProductCard = ({
+  id,
   image,
   name,
   description,
@@ -15,17 +18,39 @@ const ProductCard = ({
   const navigate = useNavigate();
   const [isInCart, setIsInCart] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const addToCartMutation = useAddToCart();
 
-  const handleCartClick = (e) => {
+  const handleCartClick = async (e) => {
     e.stopPropagation();
-    setIsInCart(!isInCart);
-    // Add to cart logic here
+    try {
+      await addToCartMutation.mutateAsync({
+        product_id: id,
+        quantity: 1,
+      });
+      setIsInCart(true);
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    }
+  };
+
+  const handleFavoriteToggle = async (e) => {
+    e.stopPropagation();
+    try {
+      if (isFavorite) {
+        await removeFromWishlist(id);
+      } else {
+        await addToWishlist(id);
+      }
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error("Failed to update wishlist:", error);
+    }
   };
 
   return (
     <div
       className="group relative w-full cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
-      onClick={() => navigate("/product-page")}
+      onClick={() => navigate(`/product-page/${id}`)} // Updated to include product ID
     >
       <div className="relative aspect-square overflow-hidden">
         <img
@@ -41,11 +66,12 @@ const ProductCard = ({
                 : 'bg-white text-gray-700 hover:bg-gray-100'}
               ${isInCart ? '' : 'md:opacity-0 md:group-hover:opacity-100'}`}
             onClick={handleCartClick}
+            disabled={addToCartMutation.isPending}
           >
             <ShoppingBag03Icon className="w-5 h-5" />
           </button>
           <div className={`${isFavorite ? '' : 'md:opacity-0 md:group-hover:opacity-100'}`}>
-            <FavouriteButton liked={isFavorite} setLiked={setIsFavorite} />
+            <FavouriteButton liked={isFavorite} setLiked={handleFavoriteToggle} />
           </div>
         </div>
       </div>

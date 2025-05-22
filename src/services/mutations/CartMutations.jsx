@@ -1,8 +1,8 @@
-import { QueryClient, useMutation } from "@tanstack/react-query";
-import { addToCart, removeFromCart, updateCart } from "../apis/CartApi";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { addToCart, removeFromCart, updateCart } from "../../lib/api";
 
 export function useAddToCart() {
-  const queryClient = QueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data) => addToCart(data),
@@ -20,7 +20,7 @@ export function useAddToCart() {
 }
 
 export function useUpdateCart() {
-  const queryClient = QueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data) => updateCart(data),
@@ -38,7 +38,7 @@ export function useUpdateCart() {
 }
 
 export function useRemoveFromCart() {
-  const queryClient = QueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data) => removeFromCart(data),

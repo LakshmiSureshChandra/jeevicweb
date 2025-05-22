@@ -8,7 +8,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const footerLinks = {
-  Company: ["About Us", "Our Store", "Contact Us"],
+  Company: ["About Us", "Our Store", "Contact"],
   "Career Opportunities": ["Selling Programs", "Advertise", "Cooperation"],
   "How to Buy": [
     "Making Payments",
@@ -16,7 +16,7 @@ const footerLinks = {
     "Buyer Protection",
     "New User Guide",
   ],
-  Help: ["FAQ", "Contact Us", "Privacy Policy"],
+  Help: ["FAQ", "Contact", "Privacy Policy"],
 };
 
 const Footer = () => {

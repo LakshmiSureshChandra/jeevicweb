@@ -19,6 +19,7 @@ import SignIn from "./pages/signin/SignIn";
 import ProfileSettings from "./pages/settings/ProfileSettings";
 import CreateGift from './pages/CreateGift';
 import ProtectedRoute from './components/ProtectedRoute';
+import ContactUs from './pages/about/ContactUs'; // Add this import
 
 const AppContent = () => {
   const location = useLocation();
@@ -34,8 +35,10 @@ const AppContent = () => {
         <Route path="/products/:category/:subCategory?" element={<Filters />} />
         <Route path="/product-page" element={<ProductPage />} />
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<ContactUs />} />
         <Route path="/cafe" element={<CafePart />} />
         <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/create-gift" element={<CreateGift />} /> 
 
         {/* Protected routes */}
         <Route path="/checkout" element={
@@ -51,11 +54,6 @@ const AppContent = () => {
         <Route path="/profile" element={
           <ProtectedRoute>
             <ProfileSettings />
-          </ProtectedRoute>
-        } />
-        <Route path="/create-gift" element={
-          <ProtectedRoute>
-            <CreateGift />
           </ProtectedRoute>
         } />
       </Routes>

@@ -16,6 +16,7 @@ const SignIn = () => {
   const [lastName, setLastName] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
   const [showProfileForm, setShowProfileForm] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let interval;
@@ -28,7 +29,7 @@ const SignIn = () => {
   }, [resendTimer]);
 
   const handleSendOtp = async () => {
-
+    setError('');
     setLoading(true);
     try {
       if (signInMethod === 'phone') {
@@ -39,13 +40,13 @@ const SignIn = () => {
       setOtpSent(true);
       setResendTimer(30);
     } catch (error) {
-      console.error('Error sending OTP:', error);
-      // Handle error (e.g., show error message to user)
+      setError(error.response?.data?.message || 'Failed to send OTP. Please try again.');
     }
     setLoading(false);
   };
 
   const handleVerifyOtp = async () => {
+    setError('');
     setLoading(true);
     try {
       const response = await verifyAccountAccess(
@@ -58,8 +59,7 @@ const SignIn = () => {
         await checkAndUpdateUserProfile();
       }
     } catch (error) {
-      console.error('Error verifying OTP:', error);
-      // Handle error (e.g., show error message to user)
+      setError(error.response?.data?.message || 'Invalid OTP. Please try again.');
     }
     setLoading(false);
   };
@@ -80,13 +80,16 @@ const SignIn = () => {
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
     try {
-      await updateUserProfile(firstName, lastName, email, profilePicture);
+      const formData = new FormData();
+      formData.append('first_name', firstName);
+      formData.append('last_name', lastName);
+      await updateUserProfile(formData);
       navigate('/', { replace: true });
     } catch (error) {
-      console.error('Error updating user profile:', error);
-      // Handle error
+      setError(error.response?.data?.message || 'Failed to update profile. Please try again.');
     }
     setLoading(false);
   };
@@ -98,6 +101,12 @@ const SignIn = () => {
           <img src="/jeeviclogo.png" alt="Jeevic Logo" className="h-12" />
         </div>
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Sign In</h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
 
         <div className="flex mb-4">
           <button
@@ -162,46 +171,32 @@ const SignIn = () => {
           </>
         )}
         {showProfileForm && (
-          <form onSubmit={handleProfileSubmit} className="mt-4">
-            <input
-              type="text"
-              placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setProfilePicture(e.target.files[0])}
-              className="w-full mb-2"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors ${loading && 'opacity-50 cursor-not-allowed'}`}
-            >
-              {loading ? 'Updating...' : 'Update Profile'}
-            </button>
-          </form>
-        )}
+    <form onSubmit={handleProfileSubmit} className="mt-4">
+      <input
+        type="text"
+        placeholder="First Name"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
+      />
+      <input
+        type="text"
+        placeholder="Last Name"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
+      />
+      <button
+        type="submit"
+        disabled={loading}
+        className={`w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 transition-colors ${loading && 'opacity-50 cursor-not-allowed'}`}
+      >
+        {loading ? 'Updating...' : 'Update Profile'}
+      </button>
+    </form>
+  )}
       </div>
     </div>
   );

@@ -25,7 +25,7 @@ const ProfileSettings = () => {
     localStorage.removeItem("access_token");
 
     // Redirect to sign-in page
-    navigate("/sign-in");
+    navigate("/");
   };
 
   // Filter out any items that don't have a corresponding component

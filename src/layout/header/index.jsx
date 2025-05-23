@@ -340,7 +340,7 @@ const Header = () => {
                   </button>
 
                   {expandedCategory === category && (
-                    <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4">
+                    <div className="grid grid-cols-2 gap-4 bg-white p-4">
                       {category.items.map((item, idx) => (
                         <Link
                           key={idx}
@@ -354,7 +354,7 @@ const Header = () => {
                         >
                           <div className="h-16 w-16">
                             <img
-                              src={`/images/categories/${(typeof item === "string" ? item : item.category).toLowerCase().replace(/\s+/g, "-")}.png`}
+                              src={item.image}
                               alt={
                                 typeof item === "string" ? item : item.category
                               }

@@ -110,7 +110,7 @@ const Home = () => {
         <img
           src={product.image_url[0]}
           alt={product.name}
-          className="h-full w-full transform object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full transform object-contain transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute top-2 left-2 flex items-center gap-1.5">
           <span className="rounded-full bg-red-600 px-2 py-1 text-xs font-semibold text-white">

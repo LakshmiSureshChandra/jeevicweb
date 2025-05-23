@@ -431,5 +431,12 @@ export const getJustForYou = async () => {
     handleError(error);
   }
 };
-
+export const getMainBanner = async () => {
+  try {
+    const response = await api.get("/banner/mainbanner");
+    return response.data[0];
+  } catch (error) {
+    handleError(error);
+  }
+};
 export default api;

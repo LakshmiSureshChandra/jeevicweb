@@ -9,6 +9,21 @@ import { Link } from "react-router-dom";
 
 const CartMenu = ({ onCheckout }) => {
   const { data: cartData = [], isLoading, error } = useGetCart();
+
+  if (!localStorage.getItem("access_token")) {
+    return (
+      <div className="text-center py-4">
+        <p className="text-gray-600 mb-4">Sign in to sync your cart across devices</p>
+        <Link
+          to="/sign-in"
+          className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition-colors"
+        >
+          Sign In
+        </Link>
+      </div>
+    );
+  }
+
   const updateCartMutation = useUpdateCart();
   const removeCartMutation = useRemoveFromCart();
 

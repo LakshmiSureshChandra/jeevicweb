@@ -40,6 +40,7 @@ const HeartIcon = ({ filled }) => {
 const Hero = ({ productData }) => {
   const [quantity, setQuantity] = useState(1);
   const [show360View, setShow360View] = useState(false);
+  // Modify these two lines
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -72,6 +73,14 @@ const Hero = ({ productData }) => {
       setCartItems([]); // Fallback to empty array on error
     }
   };
+
+  const handleQuantityChange = (change) => {
+    const newQuantity = quantity + change;
+    if (newQuantity >= 1 && newQuantity <= availability_count) {
+      setQuantity(newQuantity);
+    }
+  };
+
   useEffect(() => {
     const fetchWishlistStatus = async () => {
       const access_token = localStorage.getItem("access_token");
@@ -85,6 +94,14 @@ const Hero = ({ productData }) => {
         console.error("Failed to fetch wishlist status:", error);
       }
     };
+
+    // Add this new code to select default color and variant
+    if (colors.length > 0) {
+      setSelectedColor(Object.keys(colors[0])[0]);
+    }
+    if (variants.length > 0) {
+      setSelectedSize(variants[0]);
+    }
 
     fetchCartItems();
     fetchWishlistStatus();
@@ -318,7 +335,7 @@ const Hero = ({ productData }) => {
         <div className="flex flex-col gap-5">
           {variants.length > 0 && (
             <div className="flex items-baseline gap-6">
-              <h3 className="text-dark">Size</h3>
+              <h3 className="text-dark">Variant</h3>
               <div className="flex flex-wrap gap-2">
                 {variants.map((variant) => (
                   <button
@@ -367,7 +384,7 @@ const Hero = ({ productData }) => {
             <div className="flex items-center gap-4 rounded border border-[#C4C4C4] bg-transparent px-4 py-2 text-[#C4C4C4]">
               <button
                 className="cursor-pointer disabled:opacity-50"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                onClick={() => handleQuantityChange(-1)}
                 disabled={quantity === 1}
               >
                 <MinusSignIcon />
@@ -376,8 +393,9 @@ const Hero = ({ productData }) => {
                 {quantity}
               </span>
               <button
-                className="cursor-pointer"
-                onClick={() => setQuantity(quantity + 1)}
+                className="cursor-pointer disabled:opacity-50"
+                onClick={() => handleQuantityChange(1)}
+                disabled={quantity === availability_count}
               >
                 <PlusSignIcon />
               </button>

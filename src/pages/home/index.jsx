@@ -3,9 +3,35 @@ import Hero from "./Hero";
 import DiscoverNewItems from "./DiscoverNewItems";
 import productsData from "../../data/productsData.json";
 import { Link } from "react-router-dom";
-import { ArrowRight01Icon } from "hugeicons-react";
+import { getJustForYou } from "../../lib/api";
+import { useState, useEffect } from "react";
 
 const Home = () => {
+
+  const [justForYouProducts, setJustForYouProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchJustForYou = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        return; // Skip API call if not logged in
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await getJustForYou();
+        setJustForYouProducts(Array.isArray(response) ? response : response?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch Just For You products:", error);
+        setJustForYouProducts([]); // Set empty array on error
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchJustForYou();
+  }, []);
 
   const ProductCard = ({ product }) => (
     <div className="group relative flex-shrink-0 w-full h-full overflow-hidden rounded-xl bg-white shadow-md hover:shadow-xl transition-all duration-300">

@@ -18,28 +18,27 @@ const ProductPage = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // If no product data from state, fetch it
+        // Always fetch product data if not available from state
         if (!productData) {
           const product = await getProductById(product_id);
           setProductData({ product });
         }
-
-        // Fetch reviews and rating
+  
+        // Fetch reviews and rating without auth check
         const [reviewsData, avgRating] = await Promise.all([
           getReviewsByProductId(product_id),
           getAverageRatingByProductId(product_id)
         ]);
-
-        setReviews(reviewsData);
-        setAverageRating(avgRating);
+        setReviews(reviewsData || []);
+        setAverageRating(avgRating || 0);
       } catch (error) {
-        console.error("Failed to fetch product data:", error);
+        console.error("Failed to fetch data:", error);
         setError(error.message);
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchData();
   }, [product_id, productData]);
 

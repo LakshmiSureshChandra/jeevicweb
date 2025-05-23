@@ -1,5 +1,4 @@
 import axios from "axios";
-import { data } from "react-router-dom";
 
 const BASE_URL = "http://localhost:4545";
 const api = axios.create({
@@ -55,13 +54,12 @@ export const getAddresses = async () => {
   }
 };
 
-// Product APIs
 export const getProductsByCategory = async (categoryId) => {
   try {
     const response = await api.get(`/product/c/${categoryId}`);
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
 
@@ -70,7 +68,7 @@ export const getProductsBySubCategory = async (subCategoryId) => {
     const response = await api.get(`/product/s/${subCategoryId}`);
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
 
@@ -79,23 +77,25 @@ export const getProductById = async (productId) => {
     const response = await api.get(`/product/i/${productId}`);
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
+
 export const getReviewsByProductId = async (productId) => {
   try {
     const response = await api.get(`/review/p/${productId}`);
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
+
 export const getAverageRatingByProductId = async (productId) => {
   try {
     const response = await api.get(`/review/avg/p/${productId}`);
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
 
@@ -105,23 +105,25 @@ export const getAllCategories = async () => {
     const response = await api.get("/category");
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
+
 export const getCategoryById = async (category_id) => {
   try {
     const response = await api.get(`/category/${category_id}`);
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
+
 export const getAllSubCategories = async () => {
   try {
     const response = await api.get("/subcategory");
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
 
@@ -130,15 +132,16 @@ export const getSubcategoriesByCategory = async (categoryId) => {
     const response = await api.get(`/subcategory/c/${categoryId}`);
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
+
 export const getSubcategoriesById = async (subCategoryId) => {
   try {
     const response = await api.get(`/subcategory/${subCategoryId}`);
     return response.data;
   } catch (error) {
-    handleError(error);
+    handleError(error, false); // Don't force auth
   }
 };
 
@@ -180,7 +183,11 @@ export const addToCart = async (data) => {
     const response = await api.post("/cart", data);
     return response.data;
   } catch (error) {
-    handleError(error);
+    if (error.response?.status === 401) {
+      // Handle unauthorized without redirect
+      return { error: "unauthorized", items: [] };
+    }
+    throw error;
   }
 };
 
@@ -189,7 +196,10 @@ export const updateCart = async (data) => {
     const response = await api.patch("/cart", data);
     return response.data;
   } catch (error) {
-    handleError(error);
+    if (error.response?.status === 401) {
+      return { error: "unauthorized", items: [] };
+    }
+    throw error;
   }
 };
 
@@ -198,7 +208,10 @@ export const removeFromCart = async (data) => {
     const response = await api.delete("/cart", { data });
     return response.data;
   } catch (error) {
-    handleError(error);
+    if (error.response?.status === 401) {
+      return { error: "unauthorized", items: [] };
+    }
+    throw error;
   }
 };
 
@@ -207,7 +220,10 @@ export const getCart = async () => {
     const response = await api.get("/cart");
     return response.data;
   } catch (error) {
-    handleError(error);
+    if (error.response?.status === 401) {
+      return { items: [] }; // Return empty cart for unauthorized users
+    }
+    throw error;
   }
 };
 
@@ -216,13 +232,16 @@ export const clearCart = async () => {
     const response = await api.delete("/cart/clear");
     return response.data;
   } catch (error) {
-    handleError(error);
+    if (error.response?.status === 401) {
+      return { error: "unauthorized", items: [] };
+    }
+    throw error;
   }
 };
 
-const handleError = (error) => {
+const handleError = (error, forceAuth = true) => {
   console.error("API Error:", error);
-  if (error.response && error.response.status === 401) {
+  if (error.response && error.response.status === 401 && forceAuth) {
     handleAuthFailure();
   }
   throw error;
@@ -277,7 +296,7 @@ export const getCategoriesWithSubcategories = async () => {
 
     return transformedData;
   } catch (error) {
-    handleError(error);
+    handleError(error, false);
   }
 };
 

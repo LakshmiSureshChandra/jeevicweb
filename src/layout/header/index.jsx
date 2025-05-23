@@ -248,26 +248,26 @@ const Header = () => {
 
           {/* Cart Button with Dropdown */}
           <Popover.Root>
-          <Popover.Trigger className="hover:text-blue relative flex items-center gap-2 transition-colors">
-            <div className="relative">
-              <ShoppingBag01Icon className="h-5 w-5" />
-              {cartItemCount > 0 && (
-                <div className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  {cartItemCount}
-                </div>
-              )}
-            </div>
-            <span className="hidden text-sm font-medium md:inline">Cart</span>
-          </Popover.Trigger>
+            <Popover.Trigger className="hover:text-blue relative flex items-center gap-2 transition-colors">
+              <div className="relative">
+                <ShoppingBag01Icon className="h-5 w-5" />
+                {cartItemCount > 0 && (
+                  <div className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {cartItemCount}
+                  </div>
+                )}
+              </div>
+              <span className="hidden text-sm font-medium md:inline">Cart</span>
+            </Popover.Trigger>
 
-          <Popover.Content className="z-50 mt-2 w-72 rounded-lg bg-white p-4 shadow-lg">
-            <CartMenu
-              cartItems={cartItems}
-              updateQuantity={updateCartQuantity}
-              onCheckout={() => navigate("/checkout")}
-            />
-          </Popover.Content>
-        </Popover.Root>
+            <Popover.Content className="z-50 mt-2 w-72 rounded-lg bg-white p-4 shadow-lg">
+              <CartMenu
+                cartItems={cartItems}
+                updateQuantity={updateCartQuantity}
+                onCheckout={() => navigate("/checkout")}
+              />
+            </Popover.Content>
+          </Popover.Root>
 
           {/* Sign In / Profile Button - Hidden on mobile */}
           <button

@@ -6,7 +6,14 @@ import {
 } from "hugeicons-react";
 import { Link } from "react-router-dom";
 import { useAddToCart } from "../../services/mutations/CartMutations";
-import { addToWishlist, removeFromWishlist, getWishlist } from "../../lib/api";
+
+import { useUpdateCart } from "../../services/mutations/CartMutations";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  getWishlist,
+  getCart,
+} from "../../lib/api";
 
 const HeartIcon = ({ filled }) => {
   return (
@@ -38,6 +45,8 @@ const Hero = ({ productData }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+
   const {
     id,
     name,
@@ -52,7 +61,17 @@ const Hero = ({ productData }) => {
   const variants = JSON.parse(meta_data?.variants || "[]");
   const slashedPrice = meta_data?.slashed_price;
   const discount = meta_data?.discount;
-
+  const updateCartMutation = useUpdateCart();
+  const fetchCartItems = async () => {
+    try {
+      const res = await getCart(); // Ensure getCart is awaited
+      setCartItems(Array.isArray(res) ? res : []); // Ensure cartItems is an array
+      return res;
+    } catch (error) {
+      console.error("Failed to fetch cart items:", error);
+      setCartItems([]); // Fallback to empty array on error
+    }
+  };
   useEffect(() => {
     const fetchWishlistStatus = async () => {
       const access_token = localStorage.getItem("access_token");
@@ -60,15 +79,14 @@ const Hero = ({ productData }) => {
 
       try {
         const wishlist = await getWishlist();
-        const isInWishlist = wishlist.some(
-          (item) => item.product_id === id
-        );
+        const isInWishlist = wishlist.some((item) => item.product_id === id);
         setIsFavorite(isInWishlist);
       } catch (error) {
         console.error("Failed to fetch wishlist status:", error);
       }
     };
 
+    fetchCartItems();
     fetchWishlistStatus();
   }, [id]);
 
@@ -136,9 +154,11 @@ const Hero = ({ productData }) => {
   };
 
   const addToCartMutation = useAddToCart();
-
   const handleAddToCart = async () => {
     try {
+      const latestCartItems = await fetchCartItems();
+
+      // Prepare metadata
       const selectedColorCode = colors.find(
         (colorObj) => Object.keys(colorObj)[0] === selectedColor,
       )?.[selectedColor];
@@ -151,14 +171,37 @@ const Hero = ({ productData }) => {
         discount: discount,
         price: String(price),
       };
+      if (!Array.isArray(latestCartItems) || latestCartItems.length === 0) {
+        // 🟢 Cart is empty — directly add
+        await addToCartMutation.mutateAsync({
+          product_id: id,
+          quantity: quantity,
+          meta_data: metaDataToSend,
+        });
+      } else {
+        // 🔍 Check if product already exists
+        const existingCartItem = latestCartItems.find(
+          (item) => item.product_id === id,
+        );
 
-      await addToCartMutation.mutateAsync({
-        product_id: productData.product.id, // fixed here
-        quantity: quantity,
-        meta_data: metaDataToSend,
-      });
+        if (existingCartItem) {
+          // 🔄 If exists — update quantity
+          await updateCartMutation.mutateAsync({
+            product_id: id,
+            quantity: existingCartItem.quantity + quantity,
+            meta_data: existingCartItem.meta_data, // or metaDataToSend if updating
+          });
+        } else {
+          // ➕ Else — add new
+          await addToCartMutation.mutateAsync({
+            product_id: id,
+            quantity: quantity,
+            meta_data: metaDataToSend,
+          });
+        }
+      }
     } catch (error) {
-      console.error("Failed to add to cart:", error);
+      console.error("Failed to add/update cart:", error);
     }
   };
 
@@ -187,10 +230,11 @@ const Hero = ({ productData }) => {
             <img
               key={index}
               src={img}
-              className={`w-full cursor-pointer transition-all duration-300 ${currentImageIndex === index
+              className={`w-full cursor-pointer transition-all duration-300 ${
+                currentImageIndex === index
                   ? "border-2 border-blue-500"
                   : "opacity-50 hover:opacity-100"
-                }`}
+              }`}
               alt={`product side image ${index + 1}`}
               onClick={() => handleImageClick(index)}
             />
@@ -226,8 +270,9 @@ const Hero = ({ productData }) => {
             {images.map((_, index) => (
               <div
                 key={index}
-                className={`h-2 w-2 rounded-full ${currentImageIndex === index ? "bg-blue-500" : "bg-gray-300"
-                  }`}
+                className={`h-2 w-2 rounded-full ${
+                  currentImageIndex === index ? "bg-blue-500" : "bg-gray-300"
+                }`}
               />
             ))}
           </div>
@@ -257,8 +302,9 @@ const Hero = ({ productData }) => {
             </div>
           </div>
           <button
-            className={`cursor-pointer rounded-full p-2 shadow-md transition-colors duration-200 ${isFavorite ? "bg-red-100" : "bg-white hover:bg-gray-100"
-              } flex h-10 w-10 items-center justify-center`}
+            className={`cursor-pointer rounded-full p-2 shadow-md transition-colors duration-200 ${
+              isFavorite ? "bg-red-100" : "bg-white hover:bg-gray-100"
+            } flex h-10 w-10 items-center justify-center`}
             onClick={(e) => {
               e.stopPropagation();
               handleFavoriteToggle();
@@ -277,10 +323,11 @@ const Hero = ({ productData }) => {
                 {variants.map((variant) => (
                   <button
                     key={variant}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${selectedSize === variant
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                      selectedSize === variant
                         ? "bg-blue-500 text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
+                    }`}
                     onClick={() => setSelectedSize(variant)}
                   >
                     {variant}
@@ -300,10 +347,11 @@ const Hero = ({ productData }) => {
                   return (
                     <button
                       key={colorName}
-                      className={`h-8 w-8 rounded-full border-2 transition-transform ${selectedColor === colorName
+                      className={`h-8 w-8 rounded-full border-2 transition-transform ${
+                        selectedColor === colorName
                           ? "scale-110 border-gray-800"
                           : "border-transparent"
-                        }`}
+                      }`}
                       style={{ backgroundColor: colorCode }}
                       onClick={() => setSelectedColor(colorName)}
                     />

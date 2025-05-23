@@ -111,7 +111,8 @@ const ProductCard = ({
       console.error("Failed to update wishlist:", error);
     }
   };
-
+  // const primaryImage = image && image.length > 0 ? image_url[0] : "";
+  // console.log(image_url);
   return (
     <div
       className="group relative w-full cursor-pointer overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"

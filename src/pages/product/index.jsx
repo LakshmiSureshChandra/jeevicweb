@@ -4,7 +4,7 @@ import Hero from "./Hero";
 import Reviews from "./Reviews";
 import ReviewSlider from "./ReviewSlider";
 import YouMightLike from "../../components/YouMightLike";
-import { getReviewsByProductId, getAverageRatingByProductId } from "../../lib/api"; // Import API functions
+import { getReviewsByProductId, getAverageRatingByProductId, getProductById } from "../../lib/api"; // Import API functions
 
 const ProductPage = () => {
   const { product_id } = useParams();
@@ -12,26 +12,44 @@ const ProductPage = () => {
   const [productData, setProductData] = useState(location.state || null); // Use state from location
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   useEffect(() => {
-    if (!productData) {
-      console.error("Product data not available in state.");
-      return;
-    }
-
-    const fetchAdditionalData = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const reviewsData = await getReviewsByProductId(product_id);
-        setReviews(reviewsData);
+        // If no product data from state, fetch it
+        if (!productData) {
+          const product = await getProductById(product_id);
+          setProductData({ product });
+        }
 
-        const avgRating = await getAverageRatingByProductId(product_id);
+        // Fetch reviews and rating
+        const [reviewsData, avgRating] = await Promise.all([
+          getReviewsByProductId(product_id),
+          getAverageRatingByProductId(product_id)
+        ]);
+
+        setReviews(reviewsData);
         setAverageRating(avgRating);
       } catch (error) {
-        console.error("Failed to fetch additional product data:", error);
+        console.error("Failed to fetch product data:", error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchAdditionalData();
+    fetchData();
   }, [product_id, productData]);
+
+  if (isLoading) {
+    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="container mx-auto px-4 py-8">Error: {error}</div>;
+  }
 
   return (
     <main className="container mx-auto px-4 py-8">

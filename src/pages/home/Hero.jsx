@@ -26,8 +26,8 @@ const Hero = () => {
       navigate(`/category/${heroData.linkto.id}`);
     } else if (heroData.linkto?.type === "subcategory") {
       navigate(`/subcategory/${heroData.linkto.id}`);
-    } else {
-      navigate("/");
+    } else if (heroData.linkto?.type === "product") {
+      navigate(`/product-page/${heroData.linkto.id}`);
     }
   };
 

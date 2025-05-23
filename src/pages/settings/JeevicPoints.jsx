@@ -31,21 +31,6 @@ const JeevicPoints = () => {
           <p className="text-sm">Use points at checkout</p>
         </div>
       </div>
-
-      <div className="flex w-[90%] max-w-[600px] flex-col gap-2">
-        <h3 className="text-lg font-medium">Have any gift cards?</h3>
-        <button className="flex w-full cursor-pointer justify-center rounded-[10px] bg-[#F1F4FE] px-10 py-5 text-lg font-medium text-[#000000/50]">
-          Redeem Gift Card
-        </button>
-        <div className="flex items-center gap-4 px-1">
-          <div className="flex aspect-square w-[20px] items-center justify-center rounded-full border border-black bg-transparent text-sm">
-            i
-          </div>
-          <p className="text-sm">
-            Redeemed gift card points will be added in total points
-          </p>
-        </div>
-      </div>
     </section>
   );
 };

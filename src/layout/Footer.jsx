@@ -17,8 +17,6 @@ const footerLinks = {
 
 const Footer = () => {
   const [email, setEmail] = useState("");
-  const [isUnsubscribeModalOpen, setIsUnsubscribeModalOpen] = useState(false);
-  const [unsubscribeEmail, setUnsubscribeEmail] = useState("");
 
   const handleSubscribe = async () => {
     if (!email) return alert("Please enter an email.");
@@ -26,14 +24,7 @@ const Footer = () => {
     alert("Subscribed successfully!");
     setEmail("");
   };
-  const confirmUnsubscribe = async () => {
-    if (!unsubscribeEmail) return alert("Please enter an email.");
-    console.log(unsubscribeEmail);
-    await deletePromotionalMail(unsubscribeEmail);
-    alert("Unsubscribed successfully!");
-    setUnsubscribeEmail("");
-    setIsUnsubscribeModalOpen(false);
-  };
+
 
   return (
     <footer className="w-full bg-white">
@@ -64,12 +55,6 @@ const Footer = () => {
                   Subscribe
                 </button>
               </div>
-              <button
-                onClick={() => setIsUnsubscribeModalOpen(true)}
-                className="text-sm text-white underline hover:text-gray-200"
-              >
-                Unsubscribe from Newsletter
-              </button>
             </div>
           </div>
         </div>
@@ -120,36 +105,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      {isUnsubscribeModalOpen && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="w-full max-w-sm rounded-lg bg-white p-6">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900">
-              Unsubscribe
-            </h3>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={unsubscribeEmail}
-              onChange={(e) => setUnsubscribeEmail(e.target.value)}
-              className="mb-4 w-full rounded border border-gray-300 px-4 py-2 outline-none"
-            />
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setIsUnsubscribeModalOpen(false)}
-                className="rounded bg-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmUnsubscribe}
-                className="rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
-              >
-                Unsubscribe
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </footer>
   );
 };

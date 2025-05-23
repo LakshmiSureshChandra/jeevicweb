@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Header from "./layout/header/index";
 import Home from "./pages/home";
 import Filters from "./pages/filters";
@@ -20,15 +15,17 @@ import ProfileSettings from "./pages/settings/ProfileSettings";
 import CreateGift from "./pages/CreateGift";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ContactUs from "./pages/about/ContactUs"; // Add this import
+import Unsubscribe from "./pages/Unsubscribe";
 
 const AppContent = () => {
   const location = useLocation();
   const isCafePage = location.pathname === "/cafe";
   const isSignInPage = location.pathname === "/sign-in";
+  const isUnsubscribePage = location.pathname === "/unsubscribe";
 
   return (
     <>
-      {!isCafePage && !isSignInPage && <Header />}
+      {!isCafePage && !isSignInPage && !isUnsubscribePage && <Header />}
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
@@ -66,8 +63,9 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/unsubscribe" element={<Unsubscribe />} />
       </Routes>
-      {!isCafePage && !isSignInPage && <Footer />}
+      {!isCafePage && !isSignInPage && !isUnsubscribePage && <Footer />}
     </>
   );
 };

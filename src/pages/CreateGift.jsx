@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import ProductCard from '../components/ProductCard';
 import { useGetGiftOptions } from '../services/queries/GiftOptionQueries';
+
+const GiftCard = ({ item, onAddToGift }) => (
+  <div className="bg-white p-4 rounded-lg shadow-md">
+    <img src={item.image} alt={item.name} className="w-full h-48 object-cover rounded-md mb-4" />
+    <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
+    <p className="text-gray-600 mb-4">{item.description}</p>
+    <p className="text-blue-600 font-bold mb-4">₹{item.price.toFixed(2)}</p>
+    <button 
+      onClick={() => onAddToGift(item)}
+      className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+    >
+      Add to Gift
+    </button>
+  </div>
+);
 
 const CreateGift = () => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -11,6 +25,11 @@ const CreateGift = () => {
   const addItemToGift = (item) => {
     setSelectedItems([...selectedItems, item]);
   };
+
+  // Calculate total cost
+  const totalCost = useMemo(() => {
+    return selectedItems.reduce((sum, item) => sum + item.price, 0);
+  }, [selectedItems]);
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -32,18 +51,21 @@ const CreateGift = () => {
                 exit={{ opacity: 0, scale: 0.5 }}
                 className="bg-white p-2 rounded shadow"
               >
-                {item.name}
+                {item.name} - ₹{item.price.toFixed(2)}
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
         {selectedItems.length > 0 && (
-          <Link
-            to="/order-confirmation"
-            className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          >
-            Proceed to Order
-          </Link>
+          <div className="mt-4">
+            <p className="text-lg font-semibold">Total Cost: ₹{totalCost.toFixed(2)}</p>
+            <Link
+              to="/order-confirmation"
+              className="mt-2 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Proceed to Order
+            </Link>
+          </div>
         )}
       </div>
       
@@ -55,10 +77,10 @@ const CreateGift = () => {
       {/* Eligible Items */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {eligibleItems && eligibleItems.map((item) => (
-          <ProductCard
+          <GiftCard
             key={item.id}
-            {...item}
-            onAddToGift={() => addItemToGift(item)}
+            item={item}
+            onAddToGift={addItemToGift}
           />
         ))}
       </div>

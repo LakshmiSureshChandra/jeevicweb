@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import FavouriteButton from "../../components/ui/FavouriteButton";
 import {
   MinusSignIcon,
   PlusSignIcon,
@@ -7,7 +6,29 @@ import {
 } from "hugeicons-react";
 import { Link } from "react-router-dom";
 import { useAddToCart } from "../../services/mutations/CartMutations";
-import { addToWishlist, removeFromWishlist } from "../../lib/api";
+import { addToWishlist, removeFromWishlist, getWishlist } from "../../lib/api";
+
+const HeartIcon = ({ filled }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="21"
+      viewBox="0 0 24 21"
+      fill={filled ? "#ff0800" : "none"}
+      className="transition-all duration-300 ease-in-out"
+    >
+      <path
+        d="M12.7153 3.30239L11.9882 4.06262L11.2612 3.3024C8.99957 0.937632 5.3328 0.93763 3.0712 3.3024C0.870342 5.60367 0.802718 9.31235 2.91809 11.6997L8.99556 18.5584C10.6101 20.3806 13.3663 20.3806 14.9808 18.5584L21.0583 11.6996C23.1737 9.31232 23.1061 5.60364 20.9052 3.30238C18.6436 0.937615 14.9769 0.937618 12.7153 3.30239Z"
+        stroke={filled ? "none" : "#969696"}
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ transition: "fill 0.3s ease-in-out, stroke 0.3s ease-in-out" }}
+      />
+    </svg>
+  );
+};
 
 const Hero = ({ productData }) => {
   const [quantity, setQuantity] = useState(1);
@@ -31,7 +52,26 @@ const Hero = ({ productData }) => {
   const variants = JSON.parse(meta_data?.variants || "[]");
   const slashedPrice = meta_data?.slashed_price;
   const discount = meta_data?.discount;
-  console.log(productData);
+
+  useEffect(() => {
+    const fetchWishlistStatus = async () => {
+      const access_token = localStorage.getItem("access_token");
+      if (!access_token) return;
+
+      try {
+        const wishlist = await getWishlist();
+        const isInWishlist = wishlist.some(
+          (item) => item.product_id === id
+        );
+        setIsFavorite(isInWishlist);
+      } catch (error) {
+        console.error("Failed to fetch wishlist status:", error);
+      }
+    };
+
+    fetchWishlistStatus();
+  }, [id]);
+
   const handleImageClick = (index) => {
     setCurrentImageIndex(index);
   };
@@ -125,9 +165,9 @@ const Hero = ({ productData }) => {
   const handleFavoriteToggle = async () => {
     try {
       if (isFavorite) {
-        await removeFromWishlist(productData.id);
+        await removeFromWishlist(id);
       } else {
-        await addToWishlist(productData.id);
+        await addToWishlist(id);
       }
       setIsFavorite(!isFavorite);
     } catch (error) {
@@ -147,11 +187,10 @@ const Hero = ({ productData }) => {
             <img
               key={index}
               src={img}
-              className={`w-full cursor-pointer transition-all duration-300 ${
-                currentImageIndex === index
+              className={`w-full cursor-pointer transition-all duration-300 ${currentImageIndex === index
                   ? "border-2 border-blue-500"
                   : "opacity-50 hover:opacity-100"
-              }`}
+                }`}
               alt={`product side image ${index + 1}`}
               onClick={() => handleImageClick(index)}
             />
@@ -187,9 +226,8 @@ const Hero = ({ productData }) => {
             {images.map((_, index) => (
               <div
                 key={index}
-                className={`h-2 w-2 rounded-full ${
-                  currentImageIndex === index ? "bg-blue-500" : "bg-gray-300"
-                }`}
+                className={`h-2 w-2 rounded-full ${currentImageIndex === index ? "bg-blue-500" : "bg-gray-300"
+                  }`}
               />
             ))}
           </div>
@@ -218,7 +256,16 @@ const Hero = ({ productData }) => {
               )}
             </div>
           </div>
-          <FavouriteButton liked={isFavorite} setLiked={setIsFavorite} />
+          <button
+            className={`cursor-pointer rounded-full p-2 shadow-md transition-colors duration-200 ${isFavorite ? "bg-red-100" : "bg-white hover:bg-gray-100"
+              } flex h-10 w-10 items-center justify-center`}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFavoriteToggle();
+            }}
+          >
+            <HeartIcon filled={isFavorite} />
+          </button>
         </div>
 
         {/* Size and Color selection */}
@@ -230,11 +277,10 @@ const Hero = ({ productData }) => {
                 {variants.map((variant) => (
                   <button
                     key={variant}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                      selectedSize === variant
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${selectedSize === variant
                         ? "bg-blue-500 text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
+                      }`}
                     onClick={() => setSelectedSize(variant)}
                   >
                     {variant}
@@ -254,11 +300,10 @@ const Hero = ({ productData }) => {
                   return (
                     <button
                       key={colorName}
-                      className={`h-8 w-8 rounded-full border-2 transition-transform ${
-                        selectedColor === colorName
+                      className={`h-8 w-8 rounded-full border-2 transition-transform ${selectedColor === colorName
                           ? "scale-110 border-gray-800"
                           : "border-transparent"
-                      }`}
+                        }`}
                       style={{ backgroundColor: colorCode }}
                       onClick={() => setSelectedColor(colorName)}
                     />

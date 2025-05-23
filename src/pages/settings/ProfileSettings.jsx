@@ -4,7 +4,8 @@ import Profile from "./Profile";
 import MyOrders from "./MyOrders";
 import ShippingAddress from "./ShippingAddress";
 import JeevicPoints from "./JeevicPoints";
-import ContactUs from "../about/ContactUs"; // Import the ContactUs component
+import ContactUs from "../about/ContactUs";
+import Wishlist from "./Wishlist";
 import { useNavigate } from "react-router-dom";
 
 const componentMap = {
@@ -12,7 +13,8 @@ const componentMap = {
   "My Orders": MyOrders,
   "Shipping Address": ShippingAddress,
   "Jeevic Points": JeevicPoints,
-  "Contact Us": ContactUs, // Add ContactUs to the componentMap
+  "Contact Us": ContactUs,
+  "Wishlist": Wishlist,
 };
 
 const ProfileSettings = () => {

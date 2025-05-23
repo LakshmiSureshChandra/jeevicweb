@@ -13,6 +13,10 @@ const settingsData = {
         location: "/settings/shipping-address",
         name: "Shipping Address",
       },
+      {
+        location: "/settings/wishlist",
+        name: "Wishlist",
+      },
     ],
   ],
   Account: [

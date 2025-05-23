@@ -73,7 +73,7 @@ const Header = () => {
     timeoutRef.current = setTimeout(() => {
       setDropdownVisible(false);
       setActiveCategory(null);
-    }, 1000);
+    }, 500);
   };
 
   const updateCartQuantity = (id, change) => {

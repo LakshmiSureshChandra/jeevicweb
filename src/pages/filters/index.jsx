@@ -24,6 +24,11 @@ const Filters = () => {
   const [products, setProducts] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
   const [subCategoryName, setSubCategoryName] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [minMaxPrice, setMinMaxPrice] = useState([0, 1000]);
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [sortOption, setSortOption] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -42,8 +47,18 @@ const Filters = () => {
           setSubCategoryName(cat.name); // or setCategoryName if you prefer — depending on your data
         }
         setProducts(productsData);
-      } catch (error) {}
-      console.error("Failed to fetch products:", error);
+
+        // Calculate min and max prices
+        if (productsData.length > 0) {
+          const prices = productsData.map(product => product.price);
+          const minPrice = Math.floor(Math.min(...prices));
+          const maxPrice = Math.ceil(Math.max(...prices));
+          setMinMaxPrice([minPrice, maxPrice]);
+          setPriceRange([minPrice, maxPrice]); // Set initial price range to min and max
+        }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
     };
 
     const fetchSubCategories = async () => {
@@ -59,25 +74,67 @@ const Filters = () => {
     fetchSubCategories();
   }, [category, subCategory]);
 
+  useEffect(() => {
+    applyFiltersAndSort();
+  }, [products, priceRange, selectedBrands, sortOption]);
+
+  const applyFiltersAndSort = () => {
+    let result = [...products];
+
+    // Apply price filter
+    result = result.filter(
+      (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
+    );
+
+    // Apply brand filter
+    if (selectedBrands.length > 0) {
+      result = result.filter((product) => selectedBrands.includes(product.brand));
+    }
+
+    // Apply sorting
+    if (sortOption === "price-low-high") {
+      result.sort((a, b) => a.price - b.price);
+    } else if (sortOption === "price-high-low") {
+      result.sort((a, b) => b.price - a.price);
+    }
+
+    setFilteredProducts(result);
+  };
+
+  const handleBrandChange = (brand) => {
+    setSelectedBrands((prev) =>
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
+    );
+  };
+
   return (
     <>
       <Banner
         setShowFilter={setShowFilter}
-        subCategory={subCategoryName} // Pass subcategory name
-        totalProducts={products.length} // Pass total products count
+        subCategory={subCategoryName}
+        totalProducts={filteredProducts.length}
+        setSortOption={setSortOption} // Make sure this line is present
       />
       <div className="flex w-full justify-center">
         <div className="flex w-full flex-col gap-4 px-4 py-4 md:w-[95%] md:flex-row md:gap-6 md:px-0 md:py-6 lg:w-[90%] lg:gap-8 lg:py-8">
-          <AllFilters showFilter={showFilter} setShowFilter={setShowFilter} />
-          <FilterProducts products={products} />
+          <AllFilters
+            showFilter={showFilter}
+            setShowFilter={setShowFilter}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            selectedBrands={selectedBrands}
+            handleBrandChange={handleBrandChange}
+            minMaxPrice={minMaxPrice}  // Pass minMaxPrice to AllFilters
+          />
+          <FilterProducts products={filteredProducts} />
         </div>
       </div>
     </>
   );
 };
 
-// Banner component
-const Banner = ({ subCategory, setShowFilter, totalProducts }) => {
+// Update Banner component to accept setSortOption
+const Banner = ({ subCategory, setShowFilter, totalProducts, setSortOption }) => {
   return (
     <div className="flex w-full justify-center md:bg-[#E9E9E9]">
       <div className="flex w-[90%] max-w-[1440px] flex-col justify-between gap-4 py-6 md:flex-row">
@@ -89,7 +146,7 @@ const Banner = ({ subCategory, setShowFilter, totalProducts }) => {
           {/* Display total products */}
         </div>
         <div className="flex rounded-[4px] border border-[#e9e9e9]">
-          <SortBy />
+          <SortBy setSortOption={setSortOption} /> {/* Pass setSortOption here */}
           <button
             onClick={() => setShowFilter(true)}
             className="my-2 flex w-1/2 cursor-pointer items-center justify-center gap-2 border-l border-l-[#e9e9e9] md:hidden"
@@ -103,8 +160,16 @@ const Banner = ({ subCategory, setShowFilter, totalProducts }) => {
   );
 };
 
-// AllFilters component
-const AllFilters = ({ showFilter, setShowFilter }) => {
+// Update AllFilters component to accept selectedBrands and handleBrandChange
+const AllFilters = ({
+  showFilter,
+  setShowFilter,
+  priceRange,
+  setPriceRange,
+  selectedBrands,
+  handleBrandChange,
+  minMaxPrice, 
+}) => {
   const styleFilters = [
     { name: "Minimalist", checked: false },
     { name: "Uniqlo", checked: false },
@@ -161,27 +226,23 @@ const AllFilters = ({ showFilter, setShowFilter }) => {
           >
             <FilterSection label="BRAND">
               <div className="flex flex-col gap-5">
-                {styleFilters.map((styleFilter, i) => {
-                  return (
-                    <div
-                      key={i}
-                      tabIndex={0}
-                      className="flex items-center gap-3"
+                {styleFilters.map((styleFilter, i) => (
+                  <div key={i} tabIndex={0} className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      className="scale-125"
+                      id={`style-checkbox-${i}`}
+                      checked={selectedBrands.includes(styleFilter.name)}
+                      onChange={() => handleBrandChange(styleFilter.name)}
+                    />
+                    <label
+                      htmlFor={`style-checkbox-${i}`}
+                      className="cursor-pointer text-[#555]"
                     >
-                      <input
-                        type="checkbox"
-                        className="scale-125"
-                        id={`style-checkbox-${i}`}
-                      />
-                      <label
-                        htmlFor={`style-checkbox-${i}`}
-                        className="cursor-pointer text-[#555]"
-                      >
-                        {styleFilter.name}
-                      </label>
-                    </div>
-                  );
-                })}
+                      {styleFilter.name}
+                    </label>
+                  </div>
+                ))}
               </div>
             </FilterSection>
 
@@ -211,8 +272,8 @@ const AllFilters = ({ showFilter, setShowFilter }) => {
                 <DualRangeSlider
                   value={values}
                   onValueChange={setValues}
-                  min={min}
-                  max={max}
+                  min={minMaxPrice[0]}
+                  max={minMaxPrice[1]}
                   step={1}
                 />
               </div>
@@ -238,9 +299,9 @@ const FilterProducts = ({ products }) => {
 };
 
 // Helper components
-const SortBy = () => {
+const SortBy = ({ setSortOption }) => {
   return (
-    <Select.Root>
+    <Select.Root onValueChange={setSortOption}>
       <Select.Trigger className="flex w-1/2 cursor-pointer items-center justify-center gap-1 rounded-[4px] border-[#7B7B7B] bg-transparent p-2.5 text-sm text-[#555] md:w-fit md:border md:text-base">
         <Select.Value placeholder="Sort by order" />
         <Select.Icon>
@@ -256,9 +317,8 @@ const SortBy = () => {
         >
           <Select.Viewport className="px-5 py-4">
             <Select.Group className="flex flex-col gap-2">
-              <SelectItem value="date">Date</SelectItem>
-              <SelectItem value="price">Price</SelectItem>
-              <SelectItem value="discount">Discount</SelectItem>
+              <SelectItem value="price-low-high">Price: Low to High</SelectItem>
+              <SelectItem value="price-high-low">Price: High to Low</SelectItem>
             </Select.Group>
           </Select.Viewport>
         </Select.Content>

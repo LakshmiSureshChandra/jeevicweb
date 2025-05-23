@@ -79,6 +79,25 @@ const ViewCart = () => {
       </div>
     );
 
+    const handleCheckout = () => {
+      const orderData = {
+        products: enrichedCartData.map(item => ({
+          id: item.product_id,
+          name: item.product?.name,
+          price: item.product?.price,
+          image: item.product?.image_url?.[0] || item.product?.image || '', // Handle both cases
+          quantity: item.quantity,
+          selectedSize: item.size,
+          selectedColor: item.color
+        })),
+        total: total
+      };
+      
+      navigate('/checkout/confirmation', { 
+        state: { orderData }
+      });
+    };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="mb-6 text-2xl font-bold">Shopping Cart</h1>
@@ -104,7 +123,7 @@ const ViewCart = () => {
                     id: item.product_id,
                     name: item.product?.name,
                     price: item.product?.price,
-                    image: item.product?.image_url,
+                    image: item.product?.image_url[0],
                     quantity: item.quantity,
                   }}
                   updateQuantity={handleUpdateQuantity}
@@ -135,7 +154,7 @@ const ViewCart = () => {
                 </div>
               </div>
               <button
-                onClick={() => navigate("/checkout/confirmation")}
+                onClick={handleCheckout}
                 className="w-full rounded-lg bg-blue-600 py-3 text-white transition-colors hover:bg-blue-700"
                 disabled={enrichedCartData.length === 0}
               >

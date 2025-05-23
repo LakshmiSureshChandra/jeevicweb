@@ -14,6 +14,7 @@ import {
   getWishlist,
   getCart,
 } from "../../lib/api";
+import { useNavigate } from 'react-router-dom';
 
 const HeartIcon = ({ filled }) => {
   return (
@@ -38,6 +39,7 @@ const HeartIcon = ({ filled }) => {
 };
 
 const Hero = ({ productData }) => {
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [show360View, setShow360View] = useState(false);
   // Modify these two lines
@@ -235,6 +237,26 @@ const Hero = ({ productData }) => {
     }
   };
 
+  const handleBuyNow = () => {
+    if (!productData?.product) return;
+    
+    const orderData = {
+      products: [{
+        id: productData.product.id,
+        name: productData.product.name,
+        price: Number(productData.product.price),
+        image: productData.product.image_url?.[0] || productData.product.image || '', // Handle both cases
+        quantity: quantity,
+        selectedSize: selectedSize,
+        selectedColor: selectedColor
+      }]
+    };
+    
+    navigate('/checkout/confirmation', { 
+      state: { orderData }
+    });
+  };
+
   return (
     <section className="flex flex-col gap-8 lg:flex-row lg:gap-14">
       <div className="mx-auto flex w-full flex-col-reverse gap-1 md:w-[70%] md:flex-row lg:w-full">
@@ -413,13 +435,14 @@ const Hero = ({ productData }) => {
             >
               {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
             </button>
-            <Link
-              to="/checkout"
+            <button
+              onClick={handleBuyNow}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-[#434343] bg-transparent py-3 transition-colors hover:bg-gray-100 md:py-4"
+              disabled={!selectedSize || !selectedColor}
             >
               <ShoppingBagAddIcon />
               <span>Buy Now</span>
-            </Link>
+            </button>
           </div>
         </div>
 

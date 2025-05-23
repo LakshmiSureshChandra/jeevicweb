@@ -232,7 +232,7 @@ const Home = () => {
                           <img
                             src={product.image_url[0]}
                             alt={product.name}
-                            className="h-full w-full transform object-cover transition-transform duration-500 group-hover:scale-110"
+                            className="h-full w-full transform object-contain transition-transform duration-500 group-hover:scale-110"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-100 transition-opacity duration-300" />
                         </div>

@@ -184,10 +184,10 @@ const ProductCard = ({
         </h3>
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-lg font-bold text-gray-900">{price}</span>
+            <span className="text-lg font-bold text-gray-900">₹{price}</span>
             {meta_data.slashed_price && (
               <span className="ml-2 text-sm text-gray-500 line-through">
-                {meta_data.slashed_price}
+                ₹{meta_data.slashed_price}
               </span>
             )}
           </div>

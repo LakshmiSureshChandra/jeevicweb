@@ -16,19 +16,17 @@ const ShippingAddress = () => {
   const fetchAddresses = async () => {
     try {
       const response = await getAddresses();
-      // Check if response.data exists and use it, otherwise use response
       const addressData = response?.data || response || [];
       setAddresses(Array.isArray(addressData) ? addressData : []);
     } catch (err) {
       setError("Failed to fetch addresses");
-      setAddresses([]); // Set empty array on error
+      setAddresses([]);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    // Add confirmation dialog
     const confirmDelete = window.confirm("Are you sure you want to delete this address?");
     if (!confirmDelete) return;
 
@@ -45,12 +43,14 @@ const ShippingAddress = () => {
 
   const handleUpdate = async (id, updatedData) => {
     const data = {
+      name: updatedData.name,
+      email: updatedData.email,
       phone_number: updatedData.phone,
       address_line_1: updatedData.address,
       postcode: updatedData.postCode,
       country: updatedData.country,
-      state: updatedData.state, // Add state field
-      city: updatedData.city, // Add city field
+      state: updatedData.state,
+      city: updatedData.city,
     };
 
     try {
@@ -66,7 +66,6 @@ const ShippingAddress = () => {
         );
       }
       setEditingId(null);
-      // Fetch updated addresses after successful update
       await fetchAddresses();
     } catch (err) {
       setError("Failed to update address");
@@ -76,6 +75,8 @@ const ShippingAddress = () => {
   const handleAdd = () => {
     const newAddress = {
       id: `temp-${crypto.randomUUID()}`,
+      name: "",
+      email: "",
       address_line_1: "",
       phone_number: "",
       country: "",
@@ -97,6 +98,8 @@ const ShippingAddress = () => {
           <ShippingAddressTemplate
             key={address.id}
             id={address.id}
+            name={address.name}
+            email={address.email}
             address={address.address_line_1}
             phone={address.phone_number}
             country={address.country}

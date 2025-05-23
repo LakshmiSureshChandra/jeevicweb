@@ -2,6 +2,8 @@ import React, { useState } from "react";
 
 const ShippingAddressTemplate = ({
   id,
+  name,
+  email,
   address,
   phone,
   country,
@@ -15,6 +17,8 @@ const ShippingAddressTemplate = ({
   deletingId,
 }) => {
   const [shippingAddressData, setShippingAddressData] = useState({
+    name,
+    email,
     address,
     phone,
     country,
@@ -37,6 +41,23 @@ const ShippingAddressTemplate = ({
     <div className="flex flex-col justify-center gap-4 rounded-[8px] bg-white px-6 py-4 shadow-md">
       {isEditing ? (
         <>
+          <div className="grid grid-cols-2 gap-4">
+            <input
+              name="name"
+              placeholder="Full Name"
+              value={shippingAddressData.name}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+            <input
+              name="email"
+              type="email"
+              placeholder="Email Address"
+              value={shippingAddressData.email}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-md"
+            />
+          </div>
           <input
             name="address"
             placeholder="Address"
@@ -86,12 +107,14 @@ const ShippingAddressTemplate = ({
         </>
       ) : (
         <>
-          <p><strong>Address:</strong> {shippingAddressData.address}</p>
-          <p><strong>City:</strong> {shippingAddressData.city}</p>
-          <p><strong>State:</strong> {shippingAddressData.state}</p>
-          <p><strong>Postal Code:</strong> {shippingAddressData.postCode}</p>
-          <p><strong>Country:</strong> {shippingAddressData.country}</p>
-          <p><strong>Phone:</strong> {shippingAddressData.phone}</p>
+          <div className="flex flex-col gap-2">
+            <p className="font-medium">{name}</p>
+            <p className="text-gray-600">{email}</p>
+            <p className="text-gray-600">{address}</p>
+            <p className="text-gray-600">{city}, {state}</p>
+            <p className="text-gray-600">{country}, {postCode}</p>
+            <p className="text-gray-600">{phone}</p>
+          </div>
         </>
       )}
       <div className="flex justify-end gap-2 mt-4">

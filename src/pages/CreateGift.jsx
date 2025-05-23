@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetGiftOptions } from '../services/queries/GiftOptionQueries';
+import { useNavigate } from 'react-router-dom';
 
 const GiftCard = ({ item, onAddToGift }) => (
   <div className="bg-white p-4 rounded-lg shadow-md">
@@ -19,6 +20,7 @@ const GiftCard = ({ item, onAddToGift }) => (
 );
 
 const CreateGift = () => {
+  const navigate = useNavigate();
   const [selectedItems, setSelectedItems] = useState([]);
   const { data: eligibleItems, isLoading, error } = useGetGiftOptions();
 
@@ -33,6 +35,29 @@ const CreateGift = () => {
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
+
+  const handleProceedToOrder = () => {
+    if (selectedItems.length === 0) {
+      alert('Please add items to your gift box');
+      return;
+    }
+
+    const giftOrderData = {
+      products: [{
+        name: 'Custom Gift Box',
+        price: totalCost,
+        quantity: 1,
+        items: selectedItems.map(item => ({
+          name: item.name,
+          price: item.price
+        }))
+      }]
+    };
+
+    navigate('/checkout/order-confirmation', {
+      state: { orderData: giftOrderData }
+    });
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -59,12 +84,12 @@ const CreateGift = () => {
         {selectedItems.length > 0 && (
           <div className="mt-4">
             <p className="text-lg font-semibold">Total Cost: ₹{totalCost.toFixed(2)}</p>
-            <Link
-              to="/order-confirmation"
+            <button
+              onClick={handleProceedToOrder}
               className="mt-2 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             >
               Proceed to Order
-            </Link>
+            </button>
           </div>
         )}
       </div>

@@ -116,20 +116,25 @@ const OrderConfirmation = () => {
             {orderData && orderData.products.map((product, index) => (
   <div key={index} className="flex items-center gap-4 border-b pb-4 mb-4 last:border-b-0 last:mb-0">
     <img 
-      src={product.image || '/images/placeholder.jpg'} // Add fallback image
+      src={product.image || '/images/placeholder.jpg'}
       alt={product.name}
       className="w-20 h-20 object-cover rounded"
       onError={(e) => {
-        e.target.src = '/images/placeholder.jpg'; // Fallback on error
+        e.target.src = '/images/placeholder.jpg';
       }}
     />
     <div className="flex-grow">
       <h3 className="font-medium">{product.name}</h3>
-      {product.selectedSize && (
-        <p className="text-gray-600">Size: {product.selectedSize}</p>
-      )}
-      {product.selectedColor && (
-        <p className="text-gray-600">Color: {product.selectedColor}</p>
+      {product.items && (
+        <div className="mt-2 space-y-1">
+          <p className="text-sm font-medium text-gray-700">Gift Box Contents:</p>
+          {product.items.map((item, idx) => (
+            <div key={idx} className="flex items-center justify-between text-sm text-gray-600">
+              <span>{item.name}</span>
+              <span>₹{item.price.toFixed(2)}</span>
+            </div>
+          ))}
+        </div>
       )}
       <p className="text-gray-600">Quantity: {product.quantity}</p>
       <p className="font-semibold">₹{(product.price * product.quantity).toFixed(2)}</p>

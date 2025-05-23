@@ -10,7 +10,13 @@ import {
 import DualRangeSlider from "../../components/ui/DualRangeSlider";
 import SelectItem from "../../components/ui/SelectItem";
 import ProductCard from "../../components/ProductCard";
-import { getProductsBySubCategory, getAllSubCategories, getSubcategoriesById } from "../../lib/api"; // Import API functions
+import {
+  getProductsBySubCategory,
+  getAllSubCategories,
+  getSubcategoriesById,
+  getProductsByCategory,
+  getCategoryById,
+} from "../../lib/api"; // Import API functions
 
 const Filters = () => {
   const [showFilter, setShowFilter] = useState(false);
@@ -22,21 +28,22 @@ const Filters = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const subCategoryId = subCategory; // Assuming subCategory is the ID
-        const productsData = await getProductsBySubCategory(subCategoryId);
+        let productsData = [];
+        if (subCategory) {
+          // Fetch by subcategory
+          productsData = await getProductsBySubCategory(subCategory);
+          // Fetch and set subcategory name
+          const subCategoryData = await getSubcategoriesById(subCategory);
+          setSubCategoryName(subCategoryData.name);
+        } else {
+          // Fetch by category
+          const cat = await getCategoryById(category);
+          productsData = await getProductsByCategory(category);
+          setSubCategoryName(cat.name); // or setCategoryName if you prefer — depending on your data
+        }
         setProducts(productsData);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      }
-    };
-
-    const fetchSubCategoryName = async () => {
-      try {
-        const subCategoryData = await getSubcategoriesById(subCategory);
-        setSubCategoryName(subCategoryData.name);
-      } catch (error) {
-        console.error("Failed to fetch subcategory name:", error);
-      }
+      } catch (error) {}
+      console.error("Failed to fetch products:", error);
     };
 
     const fetchSubCategories = async () => {
@@ -49,9 +56,8 @@ const Filters = () => {
     };
 
     fetchProducts();
-    fetchSubCategoryName();
     fetchSubCategories();
-  }, [subCategory]);
+  }, [category, subCategory]);
 
   return (
     <>
@@ -61,7 +67,7 @@ const Filters = () => {
         totalProducts={products.length} // Pass total products count
       />
       <div className="flex w-full justify-center">
-        <div className="flex flex-col md:flex-row w-full md:w-[95%] lg:w-[90%] gap-4 md:gap-6 lg:gap-8 py-4 md:py-6 lg:py-8 px-4 md:px-0">
+        <div className="flex w-full flex-col gap-4 px-4 py-4 md:w-[95%] md:flex-row md:gap-6 md:px-0 md:py-6 lg:w-[90%] lg:gap-8 lg:py-8">
           <AllFilters showFilter={showFilter} setShowFilter={setShowFilter} />
           <FilterProducts products={products} />
         </div>
@@ -79,7 +85,8 @@ const Banner = ({ subCategory, setShowFilter, totalProducts }) => {
           <h2 className="text-dark text-xl font-semibold capitalize">
             {subCategory}
           </h2>
-          <span className="text-[#555]">{totalProducts} items</span> {/* Display total products */}
+          <span className="text-[#555]">{totalProducts} items</span>{" "}
+          {/* Display total products */}
         </div>
         <div className="flex rounded-[4px] border border-[#e9e9e9]">
           <SortBy />
@@ -133,7 +140,7 @@ const AllFilters = ({ showFilter, setShowFilter }) => {
         showFilter ? "block" : "hidden"
       } md:block`}
     >
-      <div className="h-full w-full overflow-y-auto bg-white py-4 px-4 shadow-lg md:sticky md:top-5 md:w-full lg:w-[250px] xl:w-[300px] md:p-2 md:py-0 md:shadow-none">
+      <div className="h-full w-full overflow-y-auto bg-white px-4 py-4 shadow-lg md:sticky md:top-5 md:w-full md:p-2 md:py-0 md:shadow-none lg:w-[250px] xl:w-[300px]">
         <div>
           <div className="flex items-center justify-between">
             <h2 className="text-dark flex items-center gap-4 px-5">
@@ -150,17 +157,17 @@ const AllFilters = ({ showFilter, setShowFilter }) => {
           <Accordion.Root
             className="mt-4 flex w-full flex-col"
             type="multiple"
-            defaultValue={[
-              "BRAND",
-              "PRICE",
-            ]}
+            defaultValue={["BRAND", "PRICE"]}
           >
-
             <FilterSection label="BRAND">
               <div className="flex flex-col gap-5">
                 {styleFilters.map((styleFilter, i) => {
                   return (
-                    <div key={i} tabIndex={0} className="flex items-center gap-3">
+                    <div
+                      key={i}
+                      tabIndex={0}
+                      className="flex items-center gap-3"
+                    >
                       <input
                         type="checkbox"
                         className="scale-125"
@@ -220,8 +227,8 @@ const AllFilters = ({ showFilter, setShowFilter }) => {
 // FilterProducts component
 const FilterProducts = ({ products }) => {
   return (
-    <div className="flex-1 w-full">
-      <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+    <div className="w-full flex-1">
+      <div className="xs:grid-cols-2 grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-3 lg:gap-5 xl:grid-cols-4">
         {products.map((product, i) => (
           <ProductCard key={i} {...product} />
         ))}

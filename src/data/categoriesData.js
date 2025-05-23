@@ -7,16 +7,17 @@ const fetchData = async () => {
     const subcategories = await getAllSubCategories();
 
     // Map categories into desired format
-    const structuredData = categories.map(category => {
+    const structuredData = categories.map((category) => {
       const matchedSubcategories = subcategories.filter(
-        sub => sub.category_id === category.id
+        (sub) => sub.category_id === category.id,
       );
-        
+
       return {
         title: category.name,
-        items: matchedSubcategories.map(sub => ({
+        catid: category.id,
+        items: matchedSubcategories.map((sub) => ({
           category: sub.name,
-          link:  `products/${category.id}/${sub.id}`,   // make sure your subcategory object has 'link'
+          link: `products/${category.id}/${sub.id}`, // make sure your subcategory object has 'link'
           image: sub.image_url[0], // and 'image' properties
         })),
         class: "", // default class value — adjust as needed

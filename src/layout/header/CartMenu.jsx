@@ -1,85 +1,117 @@
-import React from 'react';
-import { useGetCart } from '../../services/queries/CartQueries';
-import { useUpdateCart, useRemoveFromCart } from '../../services/mutations/CartMutations';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { useGetCart } from "../../services/queries/CartQueries";
+import {
+  useUpdateCart,
+  useRemoveFromCart,
+} from "../../services/mutations/CartMutations";
+import { useGetProductsByIds } from "../../services/queries/ProductQueries";
+import { Link } from "react-router-dom";
 
 const CartMenu = ({ onCheckout }) => {
   const { data: cartData = [], isLoading, error } = useGetCart();
   const updateCartMutation = useUpdateCart();
   const removeCartMutation = useRemoveFromCart();
 
-  const total = cartData.reduce((sum, item) => {
-    const price = Number(item?.price) || 0;
-    const quantity = Number(item?.quantity) || 0;
-    return sum + (price * quantity);
+  // Get product IDs from cart
+  const productIds = cartData.map((item) => item.product_id);
+
+  // Fetch products by IDs
+  const {
+    data: productData = [],
+    isLoading: productsLoading,
+    error: productsError,
+  } = useGetProductsByIds(productIds);
+
+  // Map product data for easy lookup
+  const productMap = new Map(
+    productData.map((product) => [product.id, product]),
+  );
+
+  // Combine cart items with corresponding product info
+  const enrichedCartData = cartData.map((item) => ({
+    ...item,
+    product: productMap.get(item.product_id),
+  }));
+
+  // Calculate total price
+  const total = enrichedCartData.reduce((sum, item) => {
+    const price = Number(item.product?.price) || 0;
+    const quantity = Number(item.quantity) || 0;
+    return sum + price * quantity;
   }, 0);
 
   const handleUpdateQuantity = async (productId, change) => {
-    const item = cartData.find(item => item.id === productId);
+    const item = cartData.find((item) => item.product_id === productId);
     if (!item) return;
-    
+
     const newQuantity = item.quantity + change;
-    
+
     try {
       if (newQuantity <= 0) {
         await removeCartMutation.mutateAsync(productId);
       } else {
         await updateCartMutation.mutateAsync({
           product_id: productId,
-          quantity: newQuantity
+          quantity: newQuantity,
         });
       }
     } catch (error) {
-      console.error('Failed to update cart:', error);
+      console.error("Failed to update cart:", error);
     }
   };
 
-  if (isLoading) return <div className="p-4">Loading...</div>;
-  if (error) return <div className="p-4 text-red-500">Error loading cart</div>;
+  if (isLoading || productsLoading)
+    return <div className="p-4">Loading...</div>;
+  if (error || productsError)
+    return <div className="p-4 text-red-500">Error loading cart</div>;
 
   return (
     <div className="space-y-4">
-      {cartData.length === 0 ? (
+      {enrichedCartData.length === 0 ? (
         <div className="p-4 text-center">
-          <p className="text-gray-500 mb-4">Your cart is empty</p>
-          <Link 
-            to="/" 
-            className="text-blue-600 hover:text-blue-700 font-medium"
+          <p className="mb-4 text-gray-500">Your cart is empty</p>
+          <Link
+            to="/"
+            className="font-medium text-blue-600 hover:text-blue-700"
           >
             Continue Shopping
           </Link>
         </div>
       ) : (
         <>
-          <div className={`space-y-4 ${cartData.length > 3 ? 'max-h-60 overflow-y-auto' : ''}`}>
-            {cartData.map((item) => (
-              <div key={item?.id || Math.random()} className="flex items-center justify-between">
+          <div
+            className={`space-y-4 ${enrichedCartData.length > 3 ? "max-h-60 overflow-y-auto" : ""}`}
+          >
+            {enrichedCartData.map((item) => (
+              <div key={item.id} className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  <img 
-                    src={item?.image || '/placeholder-image.jpg'} 
-                    alt={item?.name || 'Product'} 
-                    className="w-12 h-12 object-cover rounded" 
+                  <img
+                    src={item.product?.image_url[0] || "/placeholder-image.jpg"}
+                    alt={item.product?.name || "Product"}
+                    className="h-12 w-12 rounded object-cover"
                   />
                   <div>
-                    <p className="font-medium">{item?.name || 'Unknown Product'}</p>
+                    <p className="font-medium">
+                      {item.product?.name || "Unknown Product"}
+                    </p>
                     <p className="text-sm text-gray-500">
-                      ${(Number(item?.price) || 0).toFixed(2)}
+                      ₹{(Number(item.product?.price) || 0).toFixed(2)}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <button 
-                    onClick={() => handleUpdateQuantity(item?.id, -1)} 
-                    className="px-2 rounded-full bg-gray-200 hover:bg-gray-300 text-lg font-bold"
-                    disabled={!item?.id || updateCartMutation.isPending}
+                  <button
+                    onClick={() => handleUpdateQuantity(item.product_id, -1)}
+                    className="rounded-full bg-gray-200 px-2 text-lg font-bold hover:bg-gray-300"
+                    disabled={updateCartMutation.isPending}
                   >
                     -
                   </button>
-                  <span>{item?.quantity || 0}</span>
-                  <button 
-                    onClick={() => handleUpdateQuantity(item?.id, 1)} 
-                    className="px-2 rounded-full bg-gray-200 hover:bg-gray-300 text-lg font-bold"
-                    disabled={!item?.id || updateCartMutation.isPending}
+                  <span>{item.quantity}</span>
+                  <button
+                    onClick={() => handleUpdateQuantity(item.product_id, 1)}
+                    className="rounded-full bg-gray-200 px-2 text-lg font-bold hover:bg-gray-300"
+                    disabled={updateCartMutation.isPending}
                   >
                     +
                   </button>
@@ -87,15 +119,17 @@ const CartMenu = ({ onCheckout }) => {
               </div>
             ))}
           </div>
+
           <div className="border-t pt-2">
-            <p className="font-bold text-right">Total: ${total.toFixed(2)}</p>
+            <p className="text-right font-bold">Total:₹{total.toFixed(2)}</p>
           </div>
-          <button 
+
+          <button
             onClick={onCheckout}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+            className="w-full rounded-lg bg-blue-600 py-2 text-white transition-colors hover:bg-blue-700 disabled:bg-gray-400"
             disabled={updateCartMutation.isPending}
           >
-            {updateCartMutation.isPending ? 'Updating...' : 'Checkout'}
+            {updateCartMutation.isPending ? "Updating..." : "Checkout"}
           </button>
         </>
       )}

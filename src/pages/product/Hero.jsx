@@ -24,11 +24,11 @@ const Hero = ({ productData }) => {
     meta_data,
     image_url: images = [],
     price,
-    availability_count
+    availability_count,
   } = productData.product;
   // Parse meta_data
-  const colors = JSON.parse(meta_data?.colors || '[]');
-  const variants = JSON.parse(meta_data?.variants || '[]');
+  const colors = JSON.parse(meta_data?.colors || "[]");
+  const variants = JSON.parse(meta_data?.variants || "[]");
   const slashedPrice = meta_data?.slashed_price;
   const discount = meta_data?.discount;
   console.log(productData);
@@ -45,7 +45,9 @@ const Hero = ({ productData }) => {
   };
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+    setCurrentImageIndex(
+      (prevIndex) => (prevIndex - 1 + images.length) % images.length,
+    );
   };
 
   const mainImageRef = useRef(null);
@@ -59,10 +61,10 @@ const Hero = ({ productData }) => {
     };
 
     adjustSideImagesHeight();
-    window.addEventListener('resize', adjustSideImagesHeight);
+    window.addEventListener("resize", adjustSideImagesHeight);
 
     return () => {
-      window.removeEventListener('resize', adjustSideImagesHeight);
+      window.removeEventListener("resize", adjustSideImagesHeight);
     };
   }, []);
 
@@ -97,11 +99,23 @@ const Hero = ({ productData }) => {
 
   const handleAddToCart = async () => {
     try {
+      const selectedColorCode = colors.find(
+        (colorObj) => Object.keys(colorObj)[0] === selectedColor,
+      )?.[selectedColor];
+
+      const metaDataToSend = {
+        selectedSize: selectedSize,
+        selectedColorCode: selectedColorCode,
+        selectedColorName: selectedColor,
+        slashedPrice: slashedPrice,
+        discount: discount,
+        price: String(price),
+      };
+
       await addToCartMutation.mutateAsync({
-        product_id: productData.id,
+        product_id: productData.product.id, // fixed here
         quantity: quantity,
-        size: selectedSize,
-        color: selectedColor,
+        meta_data: metaDataToSend,
       });
     } catch (error) {
       console.error("Failed to add to cart:", error);
@@ -124,17 +138,19 @@ const Hero = ({ productData }) => {
   return (
     <section className="flex flex-col gap-8 lg:flex-row lg:gap-14">
       <div className="mx-auto flex w-full flex-col-reverse gap-1 md:w-[70%] md:flex-row lg:w-full">
-        <div 
-          ref={sideImagesRef} 
-          className="hidden md:flex md:w-[15%] md:flex-col md:gap-2 md:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
-          style={{ height: '400px' }}
+        <div
+          ref={sideImagesRef}
+          className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:flex md:w-[15%] md:flex-col md:gap-2 md:overflow-y-auto"
+          style={{ height: "400px" }}
         >
           {images.map((img, index) => (
             <img
               key={index}
               src={img}
               className={`w-full cursor-pointer transition-all duration-300 ${
-                currentImageIndex === index ? 'border-2 border-blue-500' : 'opacity-50 hover:opacity-100'
+                currentImageIndex === index
+                  ? "border-2 border-blue-500"
+                  : "opacity-50 hover:opacity-100"
               }`}
               alt={`product side image ${index + 1}`}
               onClick={() => handleImageClick(index)}
@@ -144,7 +160,7 @@ const Hero = ({ productData }) => {
         <div ref={mainImageRef} className="relative w-full md:w-[85%]">
           <img
             src={images[currentImageIndex]}
-            className={`w-full shrink-0 object-cover transition-transform duration-300 ${zoom ? 'scale-150 cursor-zoom-out' : 'cursor-zoom-in'}`}
+            className={`w-full shrink-0 object-cover transition-transform duration-300 ${zoom ? "scale-150 cursor-zoom-out" : "cursor-zoom-in"}`}
             alt="product main image"
             onClick={handleZoom}
             onTouchStart={handleTouchStart}
@@ -154,7 +170,7 @@ const Hero = ({ productData }) => {
           <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
             <button
               onClick={handlePrevImage}
-              className="bg-white/50 p-2 rounded-r-full"
+              className="rounded-r-full bg-white/50 p-2"
             >
               &#10094;
             </button>
@@ -162,17 +178,17 @@ const Hero = ({ productData }) => {
           <div className="absolute inset-y-0 right-0 flex items-center md:hidden">
             <button
               onClick={handleNextImage}
-              className="bg-white/50 p-2 rounded-l-full"
+              className="rounded-l-full bg-white/50 p-2"
             >
               &#10095;
             </button>
           </div>
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 md:hidden">
+          <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 transform space-x-2 md:hidden">
             {images.map((_, index) => (
               <div
                 key={index}
-                className={`w-2 h-2 rounded-full ${
-                  currentImageIndex === index ? 'bg-blue-500' : 'bg-gray-300'
+                className={`h-2 w-2 rounded-full ${
+                  currentImageIndex === index ? "bg-blue-500" : "bg-gray-300"
                 }`}
               />
             ))}
@@ -191,7 +207,9 @@ const Hero = ({ productData }) => {
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-bold text-blue-600">₹{price}</span>
               {slashedPrice && (
-                <span className="text-lg text-gray-500 line-through">₹{slashedPrice}</span>
+                <span className="text-lg text-gray-500 line-through">
+                  ₹{slashedPrice}
+                </span>
               )}
               {discount && (
                 <span className="text-sm font-semibold text-green-600">
@@ -203,8 +221,8 @@ const Hero = ({ productData }) => {
           <FavouriteButton liked={isFavorite} setLiked={setIsFavorite} />
         </div>
 
-         {/* Size and Color selection */}
-         <div className="flex flex-col gap-5">
+        {/* Size and Color selection */}
+        <div className="flex flex-col gap-5">
           {variants.length > 0 && (
             <div className="flex items-baseline gap-6">
               <h3 className="text-dark">Size</h3>
@@ -212,8 +230,10 @@ const Hero = ({ productData }) => {
                 {variants.map((variant) => (
                   <button
                     key={variant}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedSize === variant ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                      selectedSize === variant
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                     onClick={() => setSelectedSize(variant)}
                   >
@@ -234,11 +254,13 @@ const Hero = ({ productData }) => {
                   return (
                     <button
                       key={colorName}
-                      className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                        selectedColor === colorCode ? 'scale-110 border-gray-800' : 'border-transparent'
+                      className={`h-8 w-8 rounded-full border-2 transition-transform ${
+                        selectedColor === colorName
+                          ? "scale-110 border-gray-800"
+                          : "border-transparent"
                       }`}
                       style={{ backgroundColor: colorCode }}
-                      onClick={() => setSelectedColor(colorCode)}
+                      onClick={() => setSelectedColor(colorName)}
                     />
                   );
                 })}
@@ -278,7 +300,7 @@ const Hero = ({ productData }) => {
               onClick={handleAddToCart}
               disabled={addToCartMutation.isPending}
             >
-              {addToCartMutation.isPending ? 'Adding...' : 'Add to Cart'}
+              {addToCartMutation.isPending ? "Adding..." : "Add to Cart"}
             </button>
             <Link
               to="/checkout"
@@ -297,11 +319,11 @@ const Hero = ({ productData }) => {
 
       {/* 360 View modal */}
       {show360View && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
           <div className="relative h-[80vh] w-[80vw] rounded-lg bg-white p-4">
             <button
               onClick={() => setShow360View(false)}
-              className="absolute right-4 top-4 text-2xl"
+              className="absolute top-4 right-4 text-2xl"
             >
               ×
             </button>

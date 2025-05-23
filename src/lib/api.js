@@ -1,4 +1,5 @@
 import axios from "axios";
+import { data } from "react-router-dom";
 
 const BASE_URL = "http://localhost:4545";
 const api = axios.create({
@@ -107,6 +108,14 @@ export const getAllCategories = async () => {
     handleError(error);
   }
 };
+export const getCategoryById = async (category_id) => {
+  try {
+    const response = await api.get(`/category/${category_id}`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
 export const getAllSubCategories = async () => {
   try {
     const response = await api.get("/subcategory");
@@ -147,7 +156,9 @@ export const addToWishlist = async (productId) => {
 
 export const removeFromWishlist = async (productId) => {
   try {
-    const response = await api.delete("/wishlist", { data: { product_id: productId } });
+    const response = await api.delete("/wishlist", {
+      data: { product_id: productId },
+    });
     return response.data;
   } catch (error) {
     handleError(error);
@@ -164,27 +175,27 @@ export const getWishlist = async () => {
 };
 
 // Cart APIs
-export const addToCart = async (productId, quantity, metaData) => {
+export const addToCart = async (data) => {
   try {
-    const response = await api.post("/cart", { product_id: productId, quantity, meta_data: metaData });
+    const response = await api.post("/cart", data);
     return response.data;
   } catch (error) {
     handleError(error);
   }
 };
 
-export const updateCart = async (productId, quantity, metaData) => {
+export const updateCart = async (data) => {
   try {
-    const response = await api.patch("/cart", { product_id: productId, quantity, meta_data: metaData });
+    const response = await api.patch("/cart", data);
     return response.data;
   } catch (error) {
     handleError(error);
   }
 };
 
-export const removeFromCart = async (productId) => {
+export const removeFromCart = async (data) => {
   try {
-    const response = await api.delete("/cart", { data: { product_id: productId } });
+    const response = await api.delete("/cart", { data });
     return response.data;
   } catch (error) {
     handleError(error);
@@ -225,33 +236,44 @@ export const getCategoriesWithSubcategories = async () => {
       return [];
     }
 
-    const transformedData = await Promise.all(categories.map(async (category) => {
-      const subcategoriesResponse = await getSubcategoriesByCategory(category.id);
-      
-      const items = { Female: [], Male: [], Kids: [] };
-      
-      subcategoriesResponse.forEach((subcategory) => {
-        if (subcategory && subcategory.meta_data && subcategory.meta_data.gender) {
-          const gender = subcategory.meta_data.gender.toLowerCase();
-          if (gender === 'female' || gender === 'male' || gender === 'kids') {
-            items[gender.charAt(0).toUpperCase() + gender.slice(1)].push(subcategory.name);
+    const transformedData = await Promise.all(
+      categories.map(async (category) => {
+        const subcategoriesResponse = await getSubcategoriesByCategory(
+          category.id,
+        );
+
+        const items = { Female: [], Male: [], Kids: [] };
+
+        subcategoriesResponse.forEach((subcategory) => {
+          if (
+            subcategory &&
+            subcategory.meta_data &&
+            subcategory.meta_data.gender
+          ) {
+            const gender = subcategory.meta_data.gender.toLowerCase();
+            if (gender === "female" || gender === "male" || gender === "kids") {
+              items[gender.charAt(0).toUpperCase() + gender.slice(1)].push(
+                subcategory.name,
+              );
+            }
           }
-        }
-      });
+        });
 
-      const cleanedItems = Object.fromEntries(
-        Object.entries(items).filter(([_, value]) => value.length > 0)
-      );
+        const cleanedItems = Object.fromEntries(
+          Object.entries(items).filter(([_, value]) => value.length > 0),
+        );
 
-      return {
-        id: category.id,
-        name: category.name,
-        image: category.image_url && category.image_url.length > 0
-          ? category.image_url[0]
-          : "https://via.placeholder.com/150",
-        items: cleanedItems,
-      };
-    }));
+        return {
+          id: category.id,
+          name: category.name,
+          image:
+            category.image_url && category.image_url.length > 0
+              ? category.image_url[0]
+              : "https://via.placeholder.com/150",
+          items: cleanedItems,
+        };
+      }),
+    );
 
     return transformedData;
   } catch (error) {
@@ -307,7 +329,9 @@ export const fetchUserProfile = async () => {
   try {
     const access_token = localStorage.getItem("access_token");
     if (!access_token) {
-      throw new Error("Authentication access_token missing. Please login again.");
+      throw new Error(
+        "Authentication access_token missing. Please login again.",
+      );
     }
     const response = await api.get("/auth/user", {
       headers: {
@@ -323,11 +347,11 @@ export const fetchUserProfile = async () => {
 export const uploadProfilePicture = async (file) => {
   try {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
     const response = await api.put("/upload", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        "Content-Type": "multipart/form-data",
+      },
     });
     return response.data.url;
   } catch (error) {
@@ -339,27 +363,24 @@ export const updateUserProfile = async (formData) => {
   try {
     const access_token = localStorage.getItem("access_token");
     let profileData = {
-      first_name: formData.get('first_name'),
-      last_name: formData.get('last_name')
+      first_name: formData.get("first_name"),
+      last_name: formData.get("last_name"),
     };
 
     // If there's a profile picture, upload it first
-    const profilePicture = formData.get('profile_picture');
+    const profilePicture = formData.get("profile_picture");
     if (profilePicture) {
       const imageUrl = await uploadProfilePicture(profilePicture);
       profileData.profile_picture = imageUrl;
     }
 
     // Update user profile with all data including image URL if present
-    const response = await api.patch("/auth/user", 
-      profileData,
-      { 
-        headers: { 
-          Authorization: `Bearer ${access_token}`,
-          'Content-Type': 'application/json'
-        } 
-      }
-    );
+    const response = await api.patch("/auth/user", profileData, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "application/json",
+      },
+    });
     return response.data;
   } catch (error) {
     handleError(error);
@@ -369,9 +390,10 @@ export const updateUserProfile = async (formData) => {
 export const updateUserEmail = async (email) => {
   try {
     const access_token = localStorage.getItem("access_token");
-    const response = await api.post("/auth/user/email", 
+    const response = await api.post(
+      "/auth/user/email",
       { email },
-      { headers: { Authorization: `Bearer ${access_token}` } }
+      { headers: { Authorization: `Bearer ${access_token}` } },
     );
     return response.data;
   } catch (error) {
@@ -382,9 +404,10 @@ export const updateUserEmail = async (email) => {
 export const verifyEmailOtp = async (otp) => {
   try {
     const access_token = localStorage.getItem("access_token");
-    const response = await api.post("/auth/user/verify-email", 
+    const response = await api.post(
+      "/auth/user/verify-email",
       { otp },
-      { headers: { Authorization: `Bearer ${access_token}` } }
+      { headers: { Authorization: `Bearer ${access_token}` } },
     );
     return response.data;
   } catch (error) {

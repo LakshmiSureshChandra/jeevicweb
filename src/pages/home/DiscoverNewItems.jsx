@@ -56,12 +56,12 @@ const NewItemsProductCard = ({ product, categoryName }) => {
       <div className="relative min-h-[250px] overflow-hidden rounded-t-[8px] lg:min-h-[400px]">
         {/* Primary image */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-300 ease-in-out"
+          className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-opacity duration-300 ease-in-out"
           style={{ backgroundImage: `url(${primaryImage})` }}
         />
         {/* Hover image */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100"
+          className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100"
           style={{ backgroundImage: `url(${hoverImage})` }}
         />
       </div>

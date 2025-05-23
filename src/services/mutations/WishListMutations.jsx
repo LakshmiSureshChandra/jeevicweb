@@ -1,38 +1,26 @@
-import { QueryClient } from "@tanstack/react-query";
-import { addToWishList, removeFromWishList } from "../apis/WishListApi";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { addToWishlist, removeFromWishlist } from "../../lib/api";
 
-export function useAddToWishList() {
-  const queryClient = QueryClient();
+export function useAddToWishlist() {
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data) => addToWishList(data),
-    onError: (error) => console.log(error),
-    onSuccess: (data) => console.log(data),
-    onSettled: async (_, error) => {
-      if (error) {
-        console.log(error);
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ["wishlist"] });
-        console.log("invalidated");
-      }
-    },
+    mutationFn: (data) => addToWishlist(data),
+    onError: (error) => console.error(error),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    }
   });
 }
 
 export function useRemoveFromWishList() {
-  const queryClient = QueryClient();
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data) => removeFromWishList(data),
-    onError: (error) => console.log(error),
-    onSuccess: (data) => console.log(data),
-    onSettled: async (_, error) => {
-      if (error) {
-        console.log(error);
-      } else {
-        await queryClient.invalidateQueries({ queryKey: ["wishlist"] });
-        console.log("invalidated");
-      }
-    },
+    mutationFn: (data) => removeFromWishlist(data),
+    onError: (error) => console.error(error),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    }
   });
 }

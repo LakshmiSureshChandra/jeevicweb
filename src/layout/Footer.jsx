@@ -1,11 +1,7 @@
-import {
-  ArrowDown01Icon,
-  Facebook01Icon,
-  InstagramIcon,
-  SentIcon,
-} from "hugeicons-react";
-import React from "react";
+import { Facebook01Icon, InstagramIcon } from "hugeicons-react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { createPromotionalMail, deletePromotionalMail } from "../lib/api"; // adjust your path if needed
 
 const footerLinks = {
   Company: ["About Us", "Our Store", "Contact"],
@@ -20,6 +16,25 @@ const footerLinks = {
 };
 
 const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [isUnsubscribeModalOpen, setIsUnsubscribeModalOpen] = useState(false);
+  const [unsubscribeEmail, setUnsubscribeEmail] = useState("");
+
+  const handleSubscribe = async () => {
+    if (!email) return alert("Please enter an email.");
+    await createPromotionalMail(email);
+    alert("Subscribed successfully!");
+    setEmail("");
+  };
+  const confirmUnsubscribe = async () => {
+    if (!unsubscribeEmail) return alert("Please enter an email.");
+    console.log(unsubscribeEmail);
+    await deletePromotionalMail(unsubscribeEmail);
+    alert("Unsubscribed successfully!");
+    setUnsubscribeEmail("");
+    setIsUnsubscribeModalOpen(false);
+  };
+
   return (
     <footer className="w-full bg-white">
       <div className="flex w-full flex-col items-center">
@@ -31,18 +46,30 @@ const Footer = () => {
                 Subscribe to Our Newsletter
               </h2>
               <p className="max-w-2xl text-lg text-white/90">
-                Stay updated with our latest offers, new arrivals, and exclusive discounts
+                Stay updated with our latest offers, new arrivals, and exclusive
+                discounts
               </p>
               <div className="flex w-full max-w-md flex-col gap-4 sm:flex-row">
                 <input
                   type="email"
                   placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="flex-1 rounded-full px-6 py-3 outline-none"
                 />
-                <button className="rounded-full bg-blue-800 px-8 py-3 font-semibold text-white transition-colors hover:bg-blue-900">
+                <button
+                  onClick={handleSubscribe}
+                  className="rounded-full bg-blue-800 px-8 py-3 font-semibold text-white transition-colors hover:bg-blue-900"
+                >
                   Subscribe
                 </button>
               </div>
+              <button
+                onClick={() => setIsUnsubscribeModalOpen(true)}
+                className="text-sm text-white underline hover:text-gray-200"
+              >
+                Unsubscribe from Newsletter
+              </button>
             </div>
           </div>
         </div>
@@ -51,12 +78,14 @@ const Footer = () => {
         <div className="container mx-auto grid grid-cols-2 gap-8 px-4 py-16 md:grid-cols-4 lg:gap-12">
           {Object.entries(footerLinks).map(([title, items]) => (
             <div key={title}>
-              <h3 className="mb-6 text-lg font-semibold text-gray-900">{title}</h3>
+              <h3 className="mb-6 text-lg font-semibold text-gray-900">
+                {title}
+              </h3>
               <ul className="space-y-4">
                 {items.map((item) => (
                   <li key={item}>
                     <Link
-                      to={`/${item.toLowerCase().replace(/\s+/g, '-')}`}
+                      to={`/${item.toLowerCase().replace(/\s+/g, "-")}`}
                       className="text-gray-600 transition-colors hover:text-blue-600"
                     >
                       {item}
@@ -75,16 +104,52 @@ const Footer = () => {
               © 2024 Jeevic Store. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-gray-600 transition-colors hover:text-blue-600">
+              <a
+                href="#"
+                className="text-gray-600 transition-colors hover:text-blue-600"
+              >
                 <InstagramIcon className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-600 transition-colors hover:text-blue-600">
+              <a
+                href="#"
+                className="text-gray-600 transition-colors hover:text-blue-600"
+              >
                 <Facebook01Icon className="h-5 w-5" />
               </a>
             </div>
           </div>
         </div>
       </div>
+      {isUnsubscribeModalOpen && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="w-full max-w-sm rounded-lg bg-white p-6">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">
+              Unsubscribe
+            </h3>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={unsubscribeEmail}
+              onChange={(e) => setUnsubscribeEmail(e.target.value)}
+              className="mb-4 w-full rounded border border-gray-300 px-4 py-2 outline-none"
+            />
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsUnsubscribeModalOpen(false)}
+                className="rounded bg-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmUnsubscribe}
+                className="rounded bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
+              >
+                Unsubscribe
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 };

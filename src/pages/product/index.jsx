@@ -4,7 +4,7 @@ import Hero from "./Hero";
 import Reviews from "./Reviews";
 import ReviewSlider from "./ReviewSlider";
 import YouMightLike from "../../components/YouMightLike";
-import { getReviewsByProductId, getAverageRatingByProductId, getProductById } from "../../lib/api"; // Import API functions
+import { getReviewsByProductId, getAverageRatingByProductId, getProductById, getSimilarProducts } from "../../lib/api";
 
 const ProductPage = () => {
   const { product_id } = useParams();
@@ -12,6 +12,7 @@ const ProductPage = () => {
   const [productData, setProductData] = useState(location.state || null); // Use state from location
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(null);
+  const [similarProducts, setSimilarProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   useEffect(() => {
@@ -31,6 +32,16 @@ const ProductPage = () => {
         ]);
         setReviews(reviewsData || []);
         setAverageRating(avgRating || 0);
+        
+        // Fetch similar products
+        const similarProductsResponse = await getSimilarProducts(product_id);
+        if (similarProductsResponse.success && Array.isArray(similarProductsResponse.data)) {
+          setSimilarProducts(similarProductsResponse.data);
+        } else {
+          console.error("Invalid similar products data:", similarProductsResponse);
+          setSimilarProducts([]);
+        }
+
       } catch (error) {
         console.error("Failed to fetch data:", error);
         setError(error.message);
@@ -38,7 +49,7 @@ const ProductPage = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchData();
   }, [product_id, productData]);
 
@@ -57,7 +68,7 @@ const ProductPage = () => {
           <Hero productData={productData} />
           <Reviews reviews={reviews} averageRating={averageRating} />
           <ReviewSlider reviews={reviews} />
-          <YouMightLike />
+          {similarProducts.length > 0 && <YouMightLike similarProducts={similarProducts} />}
         </div>
       )}
     </main>

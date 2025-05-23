@@ -480,4 +480,13 @@ export const deletePromotionalMail = async (email) => {
   }
 };
 
+export const getSimilarProducts = async (productId) => {
+  try {
+    const response = await api.get(`/product/similarproducts/${productId}`);
+    return response.data;
+  } catch (error) {
+    handleError(error, false); // Don't force auth for public data
+  }
+};
+
 export default api;

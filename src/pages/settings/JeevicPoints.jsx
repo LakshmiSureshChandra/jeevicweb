@@ -12,10 +12,9 @@ const JeevicPoints = () => {
         </div>
 
         <div
-          style={{ backgroundImage: "url('/images/jeevic-point-bg.png')" }}
           className="absolute top-1/2 right-[130%] flex aspect-square w-[70px] -translate-y-1/2 items-center justify-center bg-cover bg-center bg-no-repeat"
         >
-          <img src="/images/jeevic-point-logo.png" alt="jeevic" />
+          <img src="/images/categories/jeeviccoin.png" alt="jeevic" />
         </div>
       </div>
 

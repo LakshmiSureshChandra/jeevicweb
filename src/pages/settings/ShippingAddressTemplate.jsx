@@ -6,6 +6,8 @@ const ShippingAddressTemplate = ({
   phone,
   country,
   postCode,
+  state,
+  city,
   onDelete,
   onUpdate,
   isEditing,
@@ -17,6 +19,8 @@ const ShippingAddressTemplate = ({
     phone,
     country,
     postCode,
+    state,
+    city,
   });
 
   const handleChange = (e) => {
@@ -24,100 +28,100 @@ const ShippingAddressTemplate = ({
     setShippingAddressData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleSave = () => {
+    onUpdate(shippingAddressData);
+    onToggleEdit();
+  };
+
   return (
-    <div className="flex flex-col justify-center gap-4 rounded-[8px] bg-white px-12 py-6">
-      <div className="flex flex-col gap-2">
-        {/* Address field */}
-        <div className="flex flex-col">
-          <h2 className="px-1 font-semibold">Address:</h2>
-          {isEditing ? (
-            <textarea
-              name="address"
-              placeholder="Enter your address"
-              value={shippingAddressData.address}
-              className="field-sizing-content resize-none px-1 outline placeholder:text-sm"
-              onChange={handleChange}
-            />
-          ) : (
-            <p className="px-1">{shippingAddressData.address}</p>
-          )}
-        </div>
-
-        {/* Phone field */}
-        <div className="flex gap-2">
-          <h2 className="px-1 font-semibold">Phone:</h2>
-          {isEditing ? (
+    <div className="flex flex-col justify-center gap-4 rounded-[8px] bg-white px-6 py-4 shadow-md">
+      {isEditing ? (
+        <>
+          <input
+            name="address"
+            placeholder="Address"
+            value={shippingAddressData.address}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+          <div className="flex gap-2">
             <input
-              type="tel"
-              name="phone"
-              placeholder="Enter your phone number"
-              value={shippingAddressData.phone}
-              className="px-1 outline placeholder:text-sm"
+              name="city"
+              placeholder="City"
+              value={shippingAddressData.city}
               onChange={handleChange}
+              className="flex-1 px-3 py-2 border rounded-md"
             />
-          ) : (
-            <p className="px-1">{shippingAddressData.phone}</p>
-          )}
-        </div>
-
-        {/* Country field */}
-        <div className="flex gap-2">
-          <h2 className="px-1 font-semibold">Country:</h2>
-          {isEditing ? (
             <input
-              type="text"
-              name="country"
-              placeholder="Enter your country"
-              value={shippingAddressData.country}
-              className="px-1 outline placeholder:text-sm"
+              name="state"
+              placeholder="State"
+              value={shippingAddressData.state}
               onChange={handleChange}
+              className="flex-1 px-3 py-2 border rounded-md"
             />
-          ) : (
-            <p className="px-1">{shippingAddressData.country}</p>
-          )}
-        </div>
-
-        {/* Post Code field */}
-        <div className="flex gap-2">
-          <h2 className="px-1 font-semibold">Post Code:</h2>
-          {isEditing ? (
+          </div>
+          <div className="flex gap-2">
             <input
-              type="text"
               name="postCode"
-              placeholder="Enter your post code"
+              placeholder="Postal Code"
               value={shippingAddressData.postCode}
-              className="px-1 outline placeholder:text-sm"
               onChange={handleChange}
+              className="flex-1 px-3 py-2 border rounded-md"
             />
-          ) : (
-            <p className="px-1">{shippingAddressData.postCode}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center gap-3">
+            <input
+              name="country"
+              placeholder="Country"
+              value={shippingAddressData.country}
+              onChange={handleChange}
+              className="flex-1 px-3 py-2 border rounded-md"
+            />
+          </div>
+          <input
+            name="phone"
+            placeholder="Phone Number"
+            value={shippingAddressData.phone}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md"
+          />
+        </>
+      ) : (
+        <>
+          <p><strong>Address:</strong> {shippingAddressData.address}</p>
+          <p><strong>City:</strong> {shippingAddressData.city}</p>
+          <p><strong>State:</strong> {shippingAddressData.state}</p>
+          <p><strong>Postal Code:</strong> {shippingAddressData.postCode}</p>
+          <p><strong>Country:</strong> {shippingAddressData.country}</p>
+          <p><strong>Phone:</strong> {shippingAddressData.phone}</p>
+        </>
+      )}
+      <div className="flex justify-end gap-2 mt-4">
         {isEditing ? (
-          <button
-            className="border-blue text-blue w-[250px] cursor-pointer rounded-full border bg-transparent py-1 text-center text-lg"
-            onClick={() => {
-              onToggleEdit();
-              onUpdate(shippingAddressData);
-            }}
-          >
-            Save
-          </button>
+          <>
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+            >
+              Save
+            </button>
+            <button
+              onClick={onToggleEdit}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+          </>
         ) : (
           <>
             <button
-              className="w-[250px] cursor-pointer rounded-full border border-black bg-transparent py-1 text-center text-lg"
               onClick={onToggleEdit}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
             >
               Edit
             </button>
             <button
-              className="w-[250px] cursor-pointer rounded-full border border-[#F81140] bg-transparent py-1 text-center text-lg text-[#F81140]"
-              onClick={onDelete}
+              onClick={() => onDelete(id)}
               disabled={deletingId === id}
+              className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:bg-red-300"
             >
               {deletingId === id ? "Deleting..." : "Delete"}
             </button>

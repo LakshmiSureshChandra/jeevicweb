@@ -49,6 +49,8 @@ const ShippingAddress = () => {
       address_line_1: updatedData.address,
       postcode: updatedData.postCode,
       country: updatedData.country,
+      state: updatedData.state, // Add state field
+      city: updatedData.city, // Add city field
     };
 
     try {
@@ -78,6 +80,8 @@ const ShippingAddress = () => {
       phone_number: "",
       country: "",
       postcode: "",
+      state: "",
+      city: "",
     };
     setAddresses((prev) => [...prev, newAddress]);
     setEditingId(newAddress.id);
@@ -97,6 +101,8 @@ const ShippingAddress = () => {
             phone={address.phone_number}
             country={address.country}
             postCode={address.postcode}
+            state={address.state}
+            city={address.city}
             onDelete={() => handleDelete(address.id)}
             onUpdate={(data) => handleUpdate(address.id, data)}
             isEditing={editingId === address.id}
@@ -107,7 +113,7 @@ const ShippingAddress = () => {
       ))}
       <button
         onClick={handleAdd}
-        className="w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        className="w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
       >
         Add New Address
       </button>

@@ -458,4 +458,26 @@ export const getMainBanner = async () => {
     handleError(error);
   }
 };
+export const createPromotionalMail = async (email) => {
+  try {
+    const response = await api.post("/promotionalemails", { email: email });
+    return response;
+  } catch (error) {
+    handleError(error);
+  }
+};
+export const deletePromotionalMail = async (email) => {
+  try {
+    console.log("Deleting promotional mail for:", email);
+
+    const response = await api.delete("/promotionalemails", {
+      data: { email: email },
+    });
+
+    return response;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 export default api;

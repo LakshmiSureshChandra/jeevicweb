@@ -48,7 +48,7 @@ const CartMenu = ({ onCheckout }) => {
 
     try {
       if (newQuantity <= 0) {
-        await removeCartMutation.mutateAsync({ product_id: productId });
+        await removeCartMutation.mutateAsync(productId);
       } else {
         await updateCartMutation.mutateAsync({
           product_id: productId,

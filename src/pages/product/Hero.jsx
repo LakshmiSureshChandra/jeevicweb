@@ -449,6 +449,61 @@ const Hero = ({ productData }) => {
         <div className="text-sm text-gray-600">
           Available: {availability_count} in stock
         </div>
+
+        <div className="text-sm text-gray-600">
+          {/* Add long description */}
+          {meta_data?.long_description && (
+  <div className="mt-6 border-t pt-6">
+    <h3 className="text-lg font-semibold mb-3">Product Description</h3>
+    <div className="prose prose-sm max-w-none">
+      {meta_data.long_description.split('\n\n').map((paragraph, index) => {
+        // Handle bullet points (lines starting with emojis)
+        if (paragraph.match(/^[•🔊🔋📶🎙️🎧⚡🎮🛠️]/m)) {
+          const [title, ...points] = paragraph.split('\n');
+          return (
+            <div key={index} className="mb-4">
+              <h4 className="font-medium text-gray-800">{title}</h4>
+              <ul className="list-none space-y-1 mt-2">
+                {points.map((point, idx) => {
+                  const [emoji, ...text] = point.trim().split(' ');
+                  return (
+                    <li key={idx} className="flex items-start gap-2 text-gray-600">
+                      <span className="text-gray-800 shrink-0">{emoji}</span>
+                      <span>{text.join(' ')}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        }
+        
+        // Handle sections with colons (like "Ideal For:")
+        if (paragraph.includes(':')) {
+          const [title, content] = paragraph.split(':');
+          return (
+            <div key={index} className="mb-4">
+              <h4 className="font-medium text-gray-800">{title.trim()}:</h4>
+              <div className="mt-2 text-gray-600">
+                {content.trim().split('\n').map((line, idx) => (
+                  <p key={idx} className="mb-1">{line.trim()}</p>
+                ))}
+              </div>
+            </div>
+          );
+        }
+
+        // Regular paragraphs
+        return (
+          <p key={index} className="mb-4 text-gray-600">
+            {paragraph.trim()}
+          </p>
+        );
+      })}
+    </div>
+  </div>
+)}
+        </div>
       </div>
 
       {/* 360 View modal */}

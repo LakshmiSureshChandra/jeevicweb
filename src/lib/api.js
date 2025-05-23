@@ -508,4 +508,13 @@ export const getFeaturedProductIds = async () => {
   }
 };
 
+export const createOrder = async (orderData) => {
+  try {
+    const response = await api.post("/order", orderData);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
 export default api;

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getAddresses } from '../../lib/api';
+import { createOrder } from '../../lib/api';
 
 const OrderConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [couponCode, setCouponCode] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const [orderData, setOrderData] = useState(() => {
     if (!location.state?.orderData) {
@@ -76,24 +79,71 @@ const OrderConfirmation = () => {
 
   const { subtotal, gst, total } = calculateTotals();
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!selectedAddress) {
       alert('Please select a shipping address');
       return;
     }
 
-    const orderDetails = {
-      shippingAddress: selectedAddress,
-      orderItems: orderData.products,
-      paymentMethod,
-      totals: { subtotal, gst, shippingFee: SHIPPING_FEE, total }
-    };
+    try {
+      setIsProcessing(true);
+      
+      // Create order
+      const orderResponse = await createOrder({
+        address_id: selectedAddress.id
+      });
 
-    if (paymentMethod === 'cod') {
-      navigate('/checkout/success', { state: { orderDetails } });
-    } else {
-      console.log('Initiating online payment');
+      if (orderResponse.error) {
+        throw new Error(orderResponse.error);
+      }
+      console.log(import.meta.env.VITE_RAZORPAY_KEY);
+      // Initialize Razorpay payment
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY,
+        amount: orderResponse.amount,
+        currency: orderResponse.currency,
+        name: "Jeevic Store",
+        description: "Order Payment",
+        order_id: orderResponse.order_id,
+        prefill: {
+          name: selectedAddress.name ,
+          email: selectedAddress.email ,
+          contact: selectedAddress.phone_number ,
+        },
+        handler: async function (response) {
+          // Payment successful
+          if (response.razorpay_payment_id) {
+            navigate('/checkout/success', { 
+              state: { 
+                orderDetails: {
+                  ...orderResponse,
+                  payment_id: response.razorpay_payment_id,
+                  shippingAddress: selectedAddress,
+                  orderItems: orderData.products,
+                  totals: { subtotal, gst, shippingFee: SHIPPING_FEE, total }
+                } 
+              } 
+            });
+          }
+        },
+        theme: {
+          color: "#3399cc",
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+      
+    } catch (error) {
+      console.error('Error creating order:', error);
+      alert('Failed to create order. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
+  };
+
+  const handleCouponChange = (e) => {
+    setCouponCode(e.target.value);
   };
 
   if (isLoading) {
@@ -182,6 +232,8 @@ const OrderConfirmation = () => {
                     />
                     <span className="ml-2">
                       {address.name}<br />
+                      <span className="text-gray-600">
+                      {address.email}</span><br />
                       {address.address_line_1}<br />
                       {address.city}, {address.state}<br />
                       {address.country}, {address.postcode}<br />
@@ -204,16 +256,18 @@ const OrderConfirmation = () => {
           </div>
 
           <button
-            onClick={handlePayment}
-            disabled={!selectedAddress}
-            className={`w-full py-3 rounded-lg transition-colors ${
-              selectedAddress 
-                ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }`}
-          >
-            proceed to payment
-          </button>
+      onClick={handlePayment}
+      disabled={isProcessing || !selectedAddress}
+      className="flex w-full cursor-pointer items-center justify-center gap-2 rounded border border-[#434343] bg-transparent py-3 transition-colors hover:bg-gray-100 md:py-4"
+    >
+      {isProcessing ? (
+        "Processing..."
+      ) : (
+        <>
+          <span>Proceed to Payment</span>
+        </>
+      )}
+    </button>
         </div>
       </div>
   );

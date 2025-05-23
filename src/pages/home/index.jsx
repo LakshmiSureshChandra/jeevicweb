@@ -3,13 +3,16 @@ import Hero from "./Hero";
 import DiscoverNewItems from "./DiscoverNewItems";
 import productsData from "../../data/productsData.json";
 import { Link } from "react-router-dom";
-import { getJustForYou } from "../../lib/api";
+import { getJustForYou, getFeaturedBanner, getFeaturedProductIds, getProductsByIds } from "../../lib/api";
 import { useState, useEffect } from "react";
+
 
 const Home = () => {
 
   const [justForYouProducts, setJustForYouProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [featuredBanner, setFeaturedBanner] = useState(null);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
 
   useEffect(() => {
     const fetchJustForYou = async () => {
@@ -30,7 +33,58 @@ const Home = () => {
       }
     };
 
+    const fetchFeaturedContent = async () => {
+      try {
+        // Fetch featured banner
+        const fetchBanner = async () => {
+          try {
+            const response = await getFeaturedBanner();
+            if (response.success && response.data.rows.length > 0) {
+              const bannerData = response.data.rows[0].videos[0];
+              setFeaturedBanner({
+                title: bannerData.text1,
+                description: bannerData.text2,
+                image_url: bannerData.url,
+                link: bannerData.linkto.id,
+                buttonText: bannerData.buttontext
+              });
+            }
+          } catch (error) {
+            console.error("Failed to fetch featured banner:", error);
+          }
+        };
+
+        // Fetch featured products
+        const fetchFeaturedProducts = async () => {
+          try {
+            const response = await getFeaturedProductIds();
+            if (response.success && response.data.rows.length > 0) {
+              const productIds = response.data.rows[0].productIds;
+              console.log("Product IDs:", productIds);
+              if (Array.isArray(productIds) && productIds.length > 0) {
+                const productDetails = await getProductsByIds(productIds);
+                console.log("Product Details:", productDetails);
+                setFeaturedProducts(productDetails.slice(0, 6)); // Limit to 6 products
+              } else {
+                console.error("No valid product IDs found");
+                setFeaturedProducts([]);
+              }
+            }
+          } catch (error) {
+            console.error("Failed to fetch featured products:", error);
+            setFeaturedProducts([]);
+          }
+        };
+
+        // Execute both fetches concurrently
+        await Promise.all([fetchBanner(), fetchFeaturedProducts()]);
+      } catch (error) {
+        console.error("Failed to fetch featured content:", error);
+      }
+    };
+
     fetchJustForYou();
+    fetchFeaturedContent();
   }, []);
 
   const ProductCard = ({ product }) => (
@@ -69,32 +123,44 @@ const Home = () => {
         <div className="flex w-[98%] flex-col gap-8">
           <section className="w-full py-12 bg-gray-50">
             <div className="flex flex-col gap-8">
-
               <div className="flex flex-col lg:flex-row items-center gap-6 px-4">
                 {/* Featured Banner */}
                 <div className="w-full lg:w-1/3 h-full">
                   <div className="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300">
                     <div className="aspect-[16/9] lg:aspect-square overflow-hidden">
-                      <video
-                        src="/flash-sale.mp4"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover opacity-100"
-                      />
+                      {featuredBanner ? (
+                        <video
+                          src={featuredBanner.image_url}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover opacity-100"
+                        />
+                      ) : (
+                        <video
+                          src="/flash-sale.mp4"
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover opacity-100"
+                        />
+                      )}
                     </div>
                     <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8 bg-gradient-to-t from-black/60 to-transparent">
                       <div className="text-left">
-                        <h3 className="text-white font-bold text-3xl sm:text-4xl md:text-5xl mb-2 sm:mb-3">Flash Sale</h3>
+                        <h3 className="text-white font-bold text-3xl sm:text-4xl md:text-5xl mb-2 sm:mb-3">
+                          {featuredBanner ? featuredBanner.title : ""}
+                        </h3>
                         <p className="text-white/90 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 max-w-[90%] sm:max-w-[80%]">
-                          Discover amazing deals with up to 50% off
+                          {featuredBanner ? featuredBanner.description : ""}
                         </p>
                         <Link
-                          to="/products/flash-sales"
+                          to={featuredBanner ? `/category/${featuredBanner.link}` : ""}
                           className="inline-flex items-center bg-white text-black px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full text-sm sm:text-base font-medium hover:bg-black hover:text-white transition-colors duration-300"
                         >
-                          View All
+                          {featuredBanner ? featuredBanner.buttonText : ""}
                         </Link>
                       </div>
                     </div>
@@ -104,10 +170,19 @@ const Home = () => {
                 {/* Grid of Products */}
                 <div className="w-full lg:w-2/3">
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
-                    {productsData.flashSaleCards.slice(0, 6).map((product, index) => (
-                      <div key={index} className="w-full">
-                        <ProductCard product={product} />
-                      </div>
+                    {featuredProducts.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        id={product.id}
+                        image_url={product.image_url}
+                        name={product.name}
+                        description={product.description}
+                        meta_data={product.meta_data}
+                        price={product.price}
+                        availability_count={product.availability_count}
+                        category_id={product.category_id}
+                        subcategory_id={product.subcategory_id}
+                      />
                     ))}
                   </div>
                 </div>
@@ -116,7 +191,7 @@ const Home = () => {
           </section>
 
           <DiscoverNewItems />
-          
+
           <section className="w-full py-1 bg-gray-50">
             <div className="flex flex-col gap-8">
               <div className="flex flex-col items-center justify-between gap-2 sm:flex-row md:items-baseline">
@@ -165,7 +240,7 @@ const Home = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex justify-center py-8">We are figuring out what you might like.</div> 
+                  <div className="flex justify-center py-8">We are figuring out what you might like.</div>
                 )
                 }
               </div>

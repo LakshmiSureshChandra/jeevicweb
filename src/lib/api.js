@@ -489,4 +489,23 @@ export const getSimilarProducts = async (productId) => {
   }
 };
 
+export const getFeaturedBanner = async () => {
+  try {
+    const response = await api.get("/banner/featured");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching featured banner:", error);
+    throw error;
+  }
+};
+
+export const getFeaturedProductIds = async () => {
+  try {
+    const response = await api.get("/featured");
+    return response.data;
+  } catch (error) {
+    handleError(error, false);
+  }
+};
+
 export default api;

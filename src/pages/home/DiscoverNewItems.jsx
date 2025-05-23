@@ -52,7 +52,7 @@ const NewItemsProductCard = ({ product, categoryName }) => {
   const hoverImage = imageUrls[1] || primaryImage;
 
   return (
-    <div className="group h-full min-w-[250px] shrink-0">
+    <div className="group h-full min-w-[350px] shrink-0">
       <div className="relative min-h-[250px] overflow-hidden rounded-t-[8px] lg:min-h-[400px]">
         {/* Primary image */}
         <div

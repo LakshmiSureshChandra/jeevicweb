@@ -117,28 +117,60 @@ const Home = () => {
 
           <DiscoverNewItems />
           
-          {/* Only render the "Just For You" section if there are products */}
-          {justForYouProducts.length > 0 && (
-            <section className="w-full py-1 bg-gray-50">
-              <div className="flex flex-col gap-8">
-                <div className="flex flex-col items-center justify-between gap-2 sm:flex-row md:items-baseline">
-                  <div className="flex items-baseline">
-                    <h2 className="text-2xl font-medium md:text-3xl">
-                      Just For You
-                    </h2>
-                  </div>
-                </div>
-
-                <div className="relative">
-                  <div className="flex overflow-x-auto gap-6 pb-4 hide-scrollbar snap-x snap-mandatory">
-                    {justForYouProducts.map((product, index) => (
-                      <ProductCard key={index} product={product} />
-                    ))}
-                  </div>
+          <section className="w-full py-1 bg-gray-50">
+            <div className="flex flex-col gap-8">
+              <div className="flex flex-col items-center justify-between gap-2 sm:flex-row md:items-baseline">
+                <div className="flex items-baseline">
+                  <h2 className="text-2xl font-medium md:text-3xl">
+                    Just For You
+                  </h2>
                 </div>
               </div>
-            </section>
-          )}
+
+              <div className="relative">
+                {isLoading ? (
+                  <div className="flex justify-center py-8">Loading...</div>
+                ) : justForYouProducts && justForYouProducts.length > 0 ? (
+                  <div className="flex overflow-x-auto gap-6 pb-4 hide-scrollbar snap-x snap-mandatory">
+                    {justForYouProducts.map((product, index) => (
+                      <div
+                        key={product.id || index}
+                        className="group relative flex-shrink-0 w-[280px] overflow-hidden rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 snap-start"
+                      >
+                        <div className="aspect-[3/4] overflow-hidden">
+                          <img
+                            src={product.image_url[0]}
+                            alt={product.name}
+                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-100 transition-opacity duration-300" />
+                        </div>
+                        <div className="absolute bottom-0 left-0 right-0 p-4 text-white md:group-hover:scale-110 md:group-hover:p-6 transition-all duration-300">
+                          <h3 className="text-lg font-bold mb-1">{product.name}</h3>
+                          <p className="text-sm text-white/90 mb-3 line-clamp-2">{product.description}</p>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="text-lg font-bold">{product.price}</span>
+                              <span className="ml-2 text-xs line-through text-white/70">{product.meta_data.slashed_price}</span>
+                            </div>
+                            <Link
+                              to={`/product-page/${product.id}`}
+                              className="bg-white text-black px-3 py-1.5 rounded-full text-sm font-medium hover:bg-black hover:text-white transition-colors duration-300"
+                            >
+                              Shop Now
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex justify-center py-8">We are figuring out what you might like.</div> 
+                )
+                }
+              </div>
+            </div>
+          </section>
 
           {/* Gifting Section */}
           <section className="flex flex-col gap-6">

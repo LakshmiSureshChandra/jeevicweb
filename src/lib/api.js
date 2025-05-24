@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:4545";
+const BASE_URL = "https://api.jeevic.com";
 const api = axios.create({
   baseURL: BASE_URL,
 });
@@ -538,7 +538,9 @@ export const trackOrder = async (shipOrderId) => {
 
 export const searchProducts = async (query) => {
   try {
-    const response = await api.get(`/product/search?query=${encodeURIComponent(query)}`);
+    const response = await api.get(
+      `/product/search?query=${encodeURIComponent(query)}`,
+    );
     return response.data;
   } catch (error) {
     handleError(error, false); // Don't force auth for search

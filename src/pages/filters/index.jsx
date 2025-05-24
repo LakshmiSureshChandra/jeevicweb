@@ -29,7 +29,7 @@ const Filters = () => {
   const [minMaxPrice, setMinMaxPrice] = useState([0, 1000]);
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [sortOption, setSortOption] = useState("");
-
+  const [styleFilters, setStyleFilters] = useState([])
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -47,7 +47,8 @@ const Filters = () => {
           setSubCategoryName(cat.name); // or setCategoryName if you prefer — depending on your data
         }
         setProducts(productsData);
-
+        const uniqueBrands = [...new Set(productsData.map(product => product.meta_data.brand))];
+        setStyleFilters(uniqueBrands.map(brand => ({ name: brand, checked: false })));
         // Calculate min and max prices
         if (productsData.length > 0) {
           const prices = productsData.map(product => product.price);
@@ -88,7 +89,7 @@ const Filters = () => {
 
     // Apply brand filter
     if (selectedBrands.length > 0) {
-      result = result.filter((product) => selectedBrands.includes(product.brand));
+      result = result.filter((product) => selectedBrands.includes(product.meta_data.brand));
     }
 
     // Apply sorting
@@ -123,6 +124,7 @@ const Filters = () => {
             priceRange={priceRange}
             setPriceRange={setPriceRange}
             selectedBrands={selectedBrands}
+            styleFilters={styleFilters}
             handleBrandChange={handleBrandChange}
             minMaxPrice={minMaxPrice}  // Pass minMaxPrice to AllFilters
           />
@@ -169,17 +171,8 @@ const AllFilters = ({
   selectedBrands,
   handleBrandChange,
   minMaxPrice, 
+  styleFilters
 }) => {
-  const styleFilters = [
-    { name: "Minimalist", checked: false },
-    { name: "Uniqlo", checked: false },
-    { name: "Zara", checked: false },
-    { name: "Gucci", checked: false },
-    { name: "Mango", checked: false },
-    { name: "Ralph Lauren", checked: false },
-    { name: "Calvin Klein", checked: false },
-    { name: "Rachel Pally", checked: false },
-  ];
 
   // Add state for price range values
   const [values, setValues] = useState([0, 1000]);

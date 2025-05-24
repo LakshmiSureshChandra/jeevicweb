@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import DiningOffers from '../DiningOffers';
 import DirectionMap from '../DirectionMap';
 import Menu from './Menu';
+import axios from 'axios';
+import { createDineInBooking } from '../../../lib/api';
 
 const Overview = () => {
   const [selectedDate, setSelectedDate] = useState('');
@@ -9,8 +11,69 @@ const Overview = () => {
   const [selectedTime, setSelectedTime] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [dates, setDates] = useState([]);
+  const [timeSlots, setTimeSlots] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const generateTimeSlotsForDate = (selectedDate) => {
+    const slots = [];
+    const now = new Date();
+    const selectedDateTime = new Date(selectedDate);
+    
+    // Set opening and closing hours (11:30 AM to 11:00 PM)
+    const openingHour = 6;
+    const openingMinute = 0;
+    const closingHour = 24;
+    const closingMinute = 0;
+
+    // Set start time
+    let startTime;
+    if (selectedDateTime.toDateString() === now.toDateString()) {
+      // If selected date is today, start from current time
+      startTime = new Date(now);
+      // Round up to next 30-minute interval
+      const currentMinutes = startTime.getMinutes();
+      startTime.setMinutes(currentMinutes + (30 - (currentMinutes % 30)));
+      startTime.setSeconds(0);
+      startTime.setMilliseconds(0);
+
+      // If current time is past closing time, return empty slots
+      if (startTime.getHours() >= closingHour && startTime.getMinutes() > closingMinute) {
+        return [];
+      }
+
+      // If current time is before opening time, start from opening time
+      const openingTime = new Date(selectedDateTime);
+      openingTime.setHours(openingHour, openingMinute, 0, 0);
+      if (startTime < openingTime) {
+        startTime = openingTime;
+      }
+    } else {
+      // If selected date is future date, start from opening time
+      startTime = new Date(selectedDateTime);
+      startTime.setHours(openingHour, openingMinute, 0, 0);
+    }
+
+    // Set end time to closing time of selected date
+    const endTime = new Date(selectedDateTime);
+    endTime.setHours(closingHour, closingMinute, 0, 0);
+
+    // Generate slots
+    while (startTime <= endTime) {
+      const timeString = startTime.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+      slots.push(timeString);
+      startTime.setMinutes(startTime.getMinutes() + 30);
+    }
+
+    return slots;
+  };
 
   useEffect(() => {
+    // Generate next 7 days
     const nextSevenDays = Array.from({length: 7}, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() + i);
@@ -19,13 +82,70 @@ const Overview = () => {
     setDates(nextSevenDays);
   }, []);
 
-  const timeSlots = ['12:00 PM', '1:00 PM', '2:00 PM', '6:00 PM', '7:00 PM', '8:00 PM'];
+  // Update time slots when date changes
+  useEffect(() => {
+    if (selectedDate) {
+      const slots = generateTimeSlotsForDate(selectedDate);
+      setTimeSlots(slots);
+    }
+  }, [selectedDate]);
+
+  const handleBookingConfirmation = async () => {
+    if (!selectedDate || !selectedGuests || !selectedTime) {
+      setError('Please select all booking details');
+      return;
+    }
+  
+    setIsLoading(true);
+    setError(null);
+  
+    try {
+      // Convert 12-hour format to 24-hour format
+      const [time, period] = selectedTime.split(' ');
+      let [hours, minutes] = time.split(':');
+      hours = parseInt(hours);
+      
+      // Convert to 24-hour format
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      // Format time string for ISO
+      const timeString = `${hours.toString().padStart(2, '0')}:${minutes}:00`;
+      const fromTime = new Date(`${selectedDate}T${timeString}`);
+      const toTime = new Date(fromTime.getTime() + 30 * 60000);
+
+      const bookingData = {
+        booking_date: selectedDate,
+        booking_time: timeString,
+        from_time: fromTime.toISOString(),
+        to_time: toTime.toISOString(),
+        number_of_people: parseInt(selectedGuests.split(' ')[0]), // Extract number from "2 guests"
+      };
+  
+      const response = await createDineInBooking(bookingData);
+  
+      if (response) {
+        setSelectedDate('');
+        setSelectedGuests('');
+        setSelectedTime('');
+        alert('Booking confirmed successfully!');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to confirm booking');
+      console.error('Booking error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
 
   return (
     <div>
       <div className="md:grid md:grid-cols-3 md:gap-6">
         <div className="md:col-span-2">
-          {/* <DiningOffers /> */}
           <div className="mt-6">
             <Menu />
           </div>
@@ -35,8 +155,7 @@ const Overview = () => {
             <div className="bg-purple-50 border border-purple-200 rounded-t-lg p-4">
               <h2 className="font-medium text-lg mb-1">Table reservation</h2>
               <p className="flex items-center gap-1 text-sm text-sky-700">
-                <img src="/disc.svg" className='h-4 w-4 text-sky-600' alt="" />
-                Flat 15% OFF + 2 more offers
+                Your booking will be reserved for 30 minutes from the time you select.
               </p>
             </div>
             
@@ -84,38 +203,41 @@ const Overview = () => {
               </div>
               
               {selectedDate && selectedGuests && (
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  {timeSlots.map((time) => (
-                    <button
-                      key={time}
-                      className={`py-2 px-3 text-sm font-medium rounded-md ${
-                        selectedTime === time
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                      onClick={() => setSelectedTime(time)}
-                    >
-                      {time}
-                    </button>
-                  ))}
+                <div className="max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                  <div className="grid grid-cols-3 gap-2">
+                    {timeSlots.map((time) => (
+                      <button
+                        key={time}
+                        className={`py-2 px-4 rounded text-sm ${
+                          selectedTime === time
+                            ? 'bg-purple-500 text-white'
+                            : 'border border-gray-300 hover:border-purple-500'
+                        }`}
+                        onClick={() => setSelectedTime(time)}
+                      >
+                        {time}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
               
               {selectedTime && (
-                <div className="mt-4 space-y-4">
-                  <input
-                    type="text"
-                    placeholder="Your Name"
-                    className="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                  />
-                  <input
-                    type="tel"
-                    placeholder="Your Mobile Number"
-                    className="w-full border border-gray-200 rounded-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                  />
-                  <button className="w-full bg-orange-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-md transition duration-200">
-                    Confirm Booking
+                <div className="mt-4">
+                  <button 
+                    className={`w-full ${
+                      isLoading 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-orange-500 hover:bg-orange-600'
+                    } text-white font-medium py-3 px-4 rounded-md transition duration-200`}
+                    onClick={handleBookingConfirmation}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Confirming...' : 'Confirm Booking'}
                   </button>
+                  {error && (
+                    <p className="mt-2 text-red-500 text-sm">{error}</p>
+                  )}
                 </div>
               )}
             </div>

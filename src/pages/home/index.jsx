@@ -11,6 +11,7 @@ import {
   getProductsByIds,
 } from "../../lib/api";
 import { useState, useEffect } from "react";
+import ParallaxHero from "../../components/ParallaxHero";
 
 const Home = () => {
   const [justForYouProducts, setJustForYouProducts] = useState([]);
@@ -206,6 +207,8 @@ const Home = () => {
             </div>
           </section>
 
+          <ParallaxHero />
+
           <DiscoverNewItems />
 
           <section className="w-full bg-gray-50 py-1">
@@ -237,7 +240,7 @@ const Home = () => {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-100 transition-opacity duration-300" />
                         </div>
                         <div className="absolute right-0 bottom-0 left-0 p-4 text-white transition-all duration-300 md:group-hover:scale-110 md:group-hover:p-6">
-                          <h3 className="mb-1 text-lg font-bold">
+                          <h3 className="mb-1 text-lg font-bold truncate">
                             {product.name}
                           </h3>
                           <p className="mb-3 line-clamp-2 text-sm text-white/90">

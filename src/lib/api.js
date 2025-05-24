@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://api.jeevic.com";
+const BASE_URL = "http://localhost:4545";
 const api = axios.create({
   baseURL: BASE_URL,
 });
@@ -544,6 +544,15 @@ export const searchProducts = async (query) => {
     return response.data;
   } catch (error) {
     handleError(error, false); // Don't force auth for search
+  }
+};
+
+export const createDineInBooking = async (bookingData) => {
+  try {
+    const response = await api.post("/dine-in/bookings", bookingData);
+    return response.data;
+  } catch (error) {
+    handleError(error);
   }
 };
 

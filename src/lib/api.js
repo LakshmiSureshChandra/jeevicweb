@@ -517,4 +517,23 @@ export const createOrder = async (orderData) => {
   }
 };
 
+export const getUserOrders = async () => {
+  try {
+    const response = await api.get("/order/user");
+    return response.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const trackOrder = async (shipOrderId) => {
+  try {
+    const response = await api.get(`/order/track/${shipOrderId}`);
+    return response.data;
+  } catch (error) {
+    handleError(error);
+    throw error;
+  }
+};
+
 export default api;

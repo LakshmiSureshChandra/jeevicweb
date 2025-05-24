@@ -16,6 +16,7 @@ import CreateGift from "./pages/CreateGift";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ContactUs from "./pages/about/ContactUs"; // Add this import
 import Unsubscribe from "./pages/Unsubscribe";
+import OrderTracking from "./pages/tracking/OrderTracking";
 
 const AppContent = () => {
   const location = useLocation();
@@ -64,6 +65,14 @@ const AppContent = () => {
           }
         />
         <Route path="/unsubscribe" element={<Unsubscribe />} />
+        <Route
+          path="/tracking/:ship_order_id"
+          element={
+            <ProtectedRoute>
+              <OrderTracking />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       {!isCafePage && !isSignInPage && !isUnsubscribePage && <Footer />}
     </>

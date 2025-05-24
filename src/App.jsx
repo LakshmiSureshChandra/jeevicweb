@@ -17,6 +17,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ContactUs from "./pages/about/ContactUs"; // Add this import
 import Unsubscribe from "./pages/Unsubscribe";
 import OrderTracking from "./pages/tracking/OrderTracking";
+import { SearchProvider } from './context/SearchContext';
+import Search from "./pages/search";
 
 const AppContent = () => {
   const location = useLocation();
@@ -38,6 +40,7 @@ const AppContent = () => {
         <Route path="/cafe" element={<CafePart />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/create-gift" element={<CreateGift />} />
+        <Route path="/search" element={<Search />} />
 
         {/* Protected routes */}
         <Route
@@ -73,18 +76,21 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         />
+        
       </Routes>
       {!isCafePage && !isSignInPage && !isUnsubscribePage && <Footer />}
     </>
   );
 };
 
-const App = () => {
+function App() {
   return (
-    <Router>
-      <ScrollToTop />
-      <AppContent />
-    </Router>
+    <SearchProvider>
+      <Router>
+        <ScrollToTop />
+        <AppContent />
+      </Router>
+    </SearchProvider>
   );
 };
 

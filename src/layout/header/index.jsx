@@ -12,6 +12,8 @@ import categoriesData from "../../data/categoriesData";
 import cardData from "../../data/cartData";
 import CartMenu from "./CartMenu";
 import { useGetCart } from "../../services/queries/CartQueries";
+import { searchProducts } from "../../lib/api";
+import { useSearch } from "../../context/SearchContext";
 
 const Header = () => {
   // Add new state for active category
@@ -20,6 +22,7 @@ const Header = () => {
   const timeoutRef = useRef(null);
   const [popupActive, setPopupActive] = useState(false);
   const [cafeTransition, setCafeTransition] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState(null);
@@ -29,6 +32,8 @@ const Header = () => {
   const parsedData = JSON.parse(localStorage.getItem("userData"));
   const { data: cartData = [], isLoading } = useGetCart();
   const cartItemCount = cartData?.length || 0;
+  const { setSearchResults, setIsSearching } = useSearch();
+
 
   const headerRef = useRef(null);
 
@@ -67,6 +72,22 @@ const Header = () => {
     }
     setDropdownVisible(true);
     setActiveCategory(category);
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+  
+    setIsSearching(true);
+    try {
+      const results = await searchProducts(searchQuery);
+      setSearchResults(results);
+      navigate('/search'); // Navigate to dedicated search route
+    } catch (error) {
+      console.error('Search failed:', error);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleMouseLeave = () => {
@@ -207,44 +228,50 @@ const Header = () => {
         {/* Right side elements */}
         <div className="flex items-center gap-4 md:gap-6">
           {/* Search Bar - Hidden on mobile */}
-          <div className="hidden items-center rounded-lg bg-gray-50 px-4 py-2 md:flex">
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="w-64 bg-transparent text-sm outline-none"
-            />
-            <Search01Icon className="hover:text-blue h-5 w-5 cursor-pointer text-gray-500 transition-colors" />
-          </div>
-
-          {/* Mobile Search Icon and Overlay */}
-          <div className="md:hidden">
-            <button onClick={() => setIsMobileSearchOpen(true)}>
-              <Search01Icon className="h-6 w-6" />
-            </button>
+          <form 
+      onSubmit={handleSearch}
+      className="hidden flex-1 max-w-xl lg:flex"
+    >
+      <div className="relative flex w-full items-center">
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search products..."
+          className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-10 focus:border-blue-500 focus:outline-none"
+        />
+        <button
+          type="submit"
+          className="absolute right-3 text-gray-400 hover:text-gray-600"
+        >
+          <Search01Icon />
+        </button>
+      </div>
+    </form>
 
             {/* Mobile Search Overlay */}
-            <div
-              className={`fixed inset-0 z-50 bg-white transition-all duration-300 ${isMobileSearchOpen ? "visible opacity-100" : "pointer-events-none invisible opacity-0"} `}
-            >
-              <div className="flex items-center justify-between border-b p-4">
-                <div className="mr-4 flex flex-1 items-center rounded-lg bg-gray-50 px-4 py-2">
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    className="w-full bg-transparent text-sm outline-none"
-                    autoFocus
-                  />
-                  <Search01Icon className="h-5 w-5 text-gray-500" />
-                </div>
-                <button
-                  onClick={() => setIsMobileSearchOpen(false)}
-                  className="p-2"
-                >
-                  <MultiplicationSignIcon className="h-6 w-6" />
-                </button>
-              </div>
+            {isMobileSearchOpen && (
+          <form 
+            onSubmit={handleSearch}
+            className="absolute left-0 top-full z-50 w-full bg-white p-4 shadow-md lg:hidden"
+          >
+            <div className="relative flex w-full items-center">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products..."
+                className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-10 focus:border-blue-500 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="absolute right-3 text-gray-400 hover:text-gray-600"
+              >
+                <Search01Icon />
+              </button>
             </div>
-          </div>
+          </form>
+        )}
 
           {/* Cart Button with Dropdown */}
           <Popover.Root>

@@ -536,4 +536,13 @@ export const trackOrder = async (shipOrderId) => {
   }
 };
 
+export const searchProducts = async (query) => {
+  try {
+    const response = await api.get(`/product/search?query=${encodeURIComponent(query)}`);
+    return response.data;
+  } catch (error) {
+    handleError(error, false); // Don't force auth for search
+  }
+};
+
 export default api;

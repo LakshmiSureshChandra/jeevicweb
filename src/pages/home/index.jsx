@@ -272,7 +272,7 @@ const Home = () => {
             </div>
           </section>
 
-          {/* Gifting Section */}
+          {/* Gifting Section
           <section className="flex flex-col gap-6">
             <h2 className="text-center text-3xl font-semibold">Gifting</h2>
             <div className="grid grid-cols-1 md:grid-cols-2">
@@ -308,7 +308,7 @@ const Home = () => {
                 </div>
               </Link>
             </div>
-          </section>
+          </section> */}
         </div>
       </div>
     </main>

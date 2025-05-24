@@ -83,6 +83,7 @@ const Hero = ({ productData }) => {
     }
   };
 
+  // Remove the dynamic height adjustment useEffect
   useEffect(() => {
     const fetchWishlistStatus = async () => {
       const access_token = localStorage.getItem("access_token");
@@ -260,16 +261,16 @@ const Hero = ({ productData }) => {
   return (
     <section className="flex flex-col gap-8 lg:flex-row lg:gap-14">
       <div className="mx-auto flex w-full flex-col-reverse gap-1 md:w-[70%] md:flex-row lg:w-full">
+        {/* Side Images with fixed height */}
         <div
-          ref={sideImagesRef}
-          className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hidden md:flex md:w-[15%] md:flex-col md:gap-2 md:overflow-y-auto"
-          style={{ height: "400px" }}
+          className="hidden md:flex md:w-[15%] md:flex-col md:gap-2 md:overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100"
+          style={{ height: '500px' }} // Fixed height for side images container
         >
           {images.map((img, index) => (
             <img
               key={index}
               src={img}
-              className={`w-full cursor-pointer transition-all duration-300 ${
+              className={`aspect-square w-full cursor-pointer object-contain transition-all duration-300 ${
                 currentImageIndex === index
                   ? "border-2 border-blue-500"
                   : "opacity-50 hover:opacity-100"
@@ -279,16 +280,22 @@ const Hero = ({ productData }) => {
             />
           ))}
         </div>
-        <div ref={mainImageRef} className="relative w-full md:w-[85%]">
-          <img
-            src={images[currentImageIndex]}
-            className={`w-full shrink-0 object-cover transition-transform duration-300 ${zoom ? "scale-150 cursor-zoom-out" : "cursor-zoom-in"}`}
-            alt="product main image"
-            onClick={handleZoom}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          />
+
+        {/* Main Image with fixed height */}
+        <div className="relative w-full md:w-[85%]">
+          <div className="h-[500px] w-full"> {/* Fixed height container */}
+            <img
+              src={images[currentImageIndex]}
+              className={`h-full w-full object-contain transition-transform duration-300 ${
+                zoom ? "scale-150 cursor-zoom-out" : "cursor-zoom-in"
+              }`}
+              alt="product main image"
+              onClick={handleZoom}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            />
+          </div>
           <div className="absolute inset-y-0 left-0 flex items-center md:hidden">
             <button
               onClick={handlePrevImage}

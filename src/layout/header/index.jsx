@@ -249,29 +249,33 @@ const Header = () => {
       </div>
     </form>
 
+    <button
+          onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+          className="lg:hidden"
+        >
+          <Search01Icon className="h-5 w-5" />
+        </button>
+
             {/* Mobile Search Overlay */}
             {isMobileSearchOpen && (
-          <form 
-            onSubmit={handleSearch}
-            className="absolute left-0 top-full z-50 w-full bg-white p-4 shadow-md lg:hidden"
-          >
-            <div className="relative flex w-full items-center">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products..."
-                className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-10 focus:border-blue-500 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="absolute right-3 text-gray-400 hover:text-gray-600"
-              >
-                <Search01Icon />
-              </button>
+            <div className="absolute left-0 top-full z-50 w-full bg-white p-4 shadow-md lg:hidden">
+              <form onSubmit={handleSearch} className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className="w-full rounded-full border border-gray-300 py-2 pl-4 pr-10 focus:border-blue-500 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <Search01Icon className="h-5 w-5" />
+                </button>
+              </form>
             </div>
-          </form>
-        )}
+          )}
 
           {/* Cart Button with Dropdown */}
           <Popover.Root>

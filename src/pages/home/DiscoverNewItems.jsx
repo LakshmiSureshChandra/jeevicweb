@@ -11,7 +11,8 @@ const DiscoverNewItems = () => {
     const fetchData = async () => {
       const productsData = await getNewItems();
       const categoriesData = await getAllCategories();
-      setProducts(productsData.data);
+      // Only take the first 3 items from the products data
+      setProducts(productsData.data.slice(0, 3));
       setCategories(categoriesData);
     };
 
@@ -30,7 +31,7 @@ const DiscoverNewItems = () => {
         <h2 className="text-2xl font-medium md:text-3xl">Discover New Items</h2>
       </div>
 
-      <div className="hide-scrollbar flex justify-around gap-6 overflow-x-scroll lg:grid lg:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
           <NewItemsProductCard
             key={product.id}

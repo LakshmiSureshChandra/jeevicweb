@@ -141,7 +141,7 @@ const ProductCard = ({
         <img
           src={image_url[0]}
           alt={name}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute top-2 right-2 flex items-center space-x-2">
           <button

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusIcon, MinusIcon, XIcon, ShoppingCartIcon, ClockIcon, HomeIcon } from 'lucide-react';
+import { getAddresses } from '../../../lib/api';
+import axios from 'axios';
 
 const MenuCategoryItem = ({ name, active = false, onClick }) => (
   <button
@@ -76,27 +78,89 @@ const OrderCart = ({ cart, onClose, onUpdateQuantity }) => (
 );
 
 const Menu = () => {
-  const [activeCategory, setActiveCategory] = useState('South Indian');
+  const [activeCategory, setActiveCategory] = useState('');
   const [cart, setCart] = useState({});
   const [showCart, setShowCart] = useState(false);
   const [orderType, setOrderType] = useState('pickup');
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState('');
+  const [selectedPickupTime, setSelectedPickupTime] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [menuItems, setMenuItems] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const categories = [
-    'South Indian', 'North Indian', 'Biryani', 'Chinese', 'Desserts', 'Beverages',
-  ];
+  // Fetch categories and dishes
+  useEffect(() => {
+    const fetchCategoriesAndDishes = async () => {
+      try {
+        setIsLoading(true);
+        // Fetch categories
+        const categoriesResponse = await axios.get('https://api.jeevic.com/dish/categories');
+        const categoriesData = categoriesResponse.data.data;
+        setCategories(categoriesData.map(cat => cat.name));
+        setActiveCategory(categoriesData[0]?.name || '');
 
-  const menuItems = {
-    'South Indian': [
-      { name: 'Masala Dosa', price: 80, photo: '/images/masala-dosa.jpg', description: 'Crispy crepe filled with spiced potatoes' },
-      { name: 'Idli Sambar', price: 60, photo: '/images/idli-sambar.jpg', description: 'Steamed rice cakes with lentil soup' },
-      { name: 'Vada', price: 50, photo: '/images/vada.jpg', description: 'Crispy lentil fritters' },
-    ],
-    'North Indian': [
-      { name: 'Butter Chicken', price: 220, photo: '/images/butter-chicken.jpg', description: 'Creamy tomato-based chicken curry' },
-      { name: 'Paneer Tikka', price: 180, photo: '/images/paneer-tikka.jpg', description: 'Grilled cottage cheese with spices' },
-      { name: 'Naan', price: 30, photo: '/images/naan.jpg', description: 'Soft leavened flatbread' },
-    ],
-    // Add items for other categories
+        // Fetch dishes
+        const dishesResponse = await axios.get('https://api.jeevic.com/dish/dishes');
+        const dishesData = dishesResponse.data.data;
+
+        // Organize dishes by category
+        const organizedDishes = categoriesData.reduce((acc, category) => {
+          acc[category.name] = dishesData.filter(dish => dish.category_id === category.id);
+          return acc;
+        }, {});
+
+        setMenuItems(organizedDishes);
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Failed to fetch menu data:', err);
+        setError('Failed to load menu items');
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategoriesAndDishes();
+  }, []);
+
+  // Fetch addresses when component mounts
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const response = await getAddresses();
+        console.log('Fetched addresses:', response); // Debug log
+        setAddresses(response);
+      } catch (error) {
+        console.error('Failed to fetch addresses:', error);
+      }
+    };
+    fetchAddresses();
+  }, []); // Empty dependency array means this runs once on mount
+
+  // Generate pickup time slots
+  const generateTimeSlots = () => {
+    const slots = [];
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(3, 0, 0, 0);
+
+    // Round up to next 30-minute interval
+    const currentMinutes = now.getMinutes();
+    now.setMinutes(currentMinutes + (30 - (currentMinutes % 30)));
+    now.setSeconds(0);
+    now.setMilliseconds(0);
+
+    let current = now;
+    while (current <= tomorrow) {
+      slots.push(current.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }));
+      current = new Date(current.getTime() + 30 * 60000);
+    }
+    return slots;
   };
 
   const handleAddToCart = (item, change = 1) => {
@@ -114,7 +178,6 @@ const Menu = () => {
   };
 
   const totalItems = Object.values(cart).reduce((sum, { quantity }) => sum + quantity, 0);
-
   return (
     <div className="bg-white rounded-lg md:border md:border-gray-200 overflow-hidden">
       <div className="p-6 border-b border-gray-200">
@@ -135,17 +198,55 @@ const Menu = () => {
             <span>Delivery</span>
           </button>
         </div>
+        
         {orderType === 'pickup' && (
-          <select className="mt-2 p-2 border border-gray-300 rounded-md">
-            <option>Select pickup time</option>
-            {/* Add time options */}
+          <select
+            className="mt-2 p-2 border border-gray-300 rounded-md w-full"
+            value={selectedPickupTime}
+            onChange={(e) => setSelectedPickupTime(e.target.value)}
+          >
+            <option value="">Select pickup time</option>
+            {generateTimeSlots().map((time) => (
+              <option key={time} value={time}>{time}</option>
+            ))}
           </select>
         )}
         {orderType === 'delivery' && (
-          <button className="mt-2 p-2 border border-gray-300 rounded-md text-left w-full">
-            Select delivery address
-          </button>
-        )}
+  <div className="mt-2">
+    <div className="space-y-4">
+      {Array.isArray(addresses) && addresses.map((address) => (
+        <div
+          key={address.id}
+          className={`p-4 border rounded-lg cursor-pointer ${
+            selectedAddress === address.id ? 'border-orange-500 bg-orange-50' : 'border-gray-200'
+          }`}
+          onClick={() => setSelectedAddress(address.id)}
+        >
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-medium text-gray-900">{address.name}</h3>
+              <p className="text-gray-600 mt-1">
+                {address.address_line_1}
+                {address.address_line_2 !== 'undefined' && `, ${address.address_line_2}`}
+              </p>
+              <p className="text-gray-600">
+                {address.city}, {address.state} - {address.postcode}
+              </p>
+              <p className="text-gray-600 mt-1">
+                Phone: {address.phone_number}
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+      {(!addresses || addresses.length === 0) && (
+        <p className="text-sm text-gray-500 text-center py-4">
+          No saved addresses found. Please add an address in your profile.
+        </p>
+      )}
+    </div>
+  </div>
+)}
       </div>
 
       <div className="p-6">
@@ -163,8 +264,13 @@ const Menu = () => {
         <div className="space-y-4">
           {menuItems[activeCategory]?.map((item) => (
             <MenuItem
-              key={item.name}
-              item={item}
+              key={item.id}
+              item={{
+                name: item.name,
+                price: item.price,
+                photo: item.image_url,
+                description: item.description
+              }}
               onAddToCart={handleAddToCart}
               quantity={cart[item.name]?.quantity || 0}
             />

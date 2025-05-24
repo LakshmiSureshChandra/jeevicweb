@@ -1,13 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const PhotoGallery = () => {
-  const images = [
-    'https://images.pexels.com/photos/1307698/pexels-photo-1307698.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    'https://images.pexels.com/photos/941861/pexels-photo-941861.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    'https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-    'https://images.pexels.com/photos/718742/pexels-photo-718742.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-  ];
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBannerImages = async () => {
+      try {
+        const response = await axios.get('https://api.jeevic.com/banner/cafeweb');
+        if (response.data.success && response.data.data.rows.length > 0) {
+          setImages(response.data.data.rows[0].images);
+        }
+        setIsLoading(false);
+      } catch (err) {
+        setError('Failed to load gallery images');
+        setIsLoading(false);
+      }
+    };
+
+    fetchBannerImages();
+  }, []);
+
+  if (isLoading) {
+    return <div className="h-[300px] flex items-center justify-center">Loading gallery...</div>;
+  }
+
+  if (error) {
+    return <div className="h-[300px] flex items-center justify-center text-red-500">{error}</div>;
+  }
 
   return (
     <div className="grid grid-cols-12 gap-1 overflow-hidden h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px]">
@@ -40,6 +62,11 @@ const PhotoGallery = () => {
               alt="Restaurant dish" 
               className="h-full w-full object-cover"
             />
+            {images.length > 4 && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <span className="text-white text-lg font-semibold">+{images.length - 4}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

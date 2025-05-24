@@ -8,7 +8,7 @@ import {
 } from "hugeicons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, Popover } from "radix-ui";
-import categoriesData from "../../data/categoriesData";
+import { fetchCategoriesData } from "../../data/categoriesData";
 import cardData from "../../data/cartData";
 import CartMenu from "./CartMenu";
 import { useGetCart } from "../../services/queries/CartQueries";
@@ -33,9 +33,17 @@ const Header = () => {
   const { data: cartData = [], isLoading } = useGetCart();
   const cartItemCount = cartData?.length || 0;
   const { setSearchResults, setIsSearching } = useSearch();
-
+  const [categoriesData, setCategoriesData] = useState([]);
 
   const headerRef = useRef(null);
+
+  useEffect(() => {
+    async function getData() {
+      const data = await fetchCategoriesData();
+      setCategoriesData(data);
+    }
+    getData();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
